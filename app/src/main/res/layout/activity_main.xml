@@ -69,5 +69,11 @@
         android:layout_height="wrap_content"
         android:text="some text"
         android:id="@+id/txtwrite" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="First choose directory"
+        android:id="@+id/btnChooseDirectory"
+        android:layout_marginLeft="38dp"/>
 
 </LinearLayout>

@@ -38,11 +38,14 @@ import encryption.com.AES.Encrypt;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int FILE_SELECT_CODE = 0;
+    private static final int DIRECTORY_SELECT_CODE = 2;
+    private String pathDirectory = "";
     private EditText mEditTextKey;
     private EditText mEditSourceText;
     private Button btnEncryptText;
     private Button btnDecryptText;
     private Button btnSelectFile;
+    private Button btnChooseDirectory;
     private TextView mTextViewEncrypted;
     private TextView mTextViewDecrypted;
 
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnEncryptText = (Button) findViewById(R.id.btnEncryptText);
         btnDecryptText = (Button) findViewById(R.id.btnDecryptText);
         btnSelectFile = (Button) findViewById(R.id.btnChooseFile);
-
+        btnChooseDirectory = (Button) findViewById(R.id.btnChooseDirectory);
 
         mTextViewEncrypted = (TextView) findViewById(R.id.textViewEncrypted);
         mTextViewDecrypted  = (TextView) findViewById(R.id.textViewDecrypted);
@@ -69,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnEncryptText.setOnClickListener(this);
         btnDecryptText.setOnClickListener(this);
         btnSelectFile.setOnClickListener(this);
-
+        btnChooseDirectory.setOnClickListener(this);
 
     }
 
@@ -94,13 +97,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
               //  Write2();
                // Log.d("WWWW", "GGGG");
                 break;
+            case R.id.btnChooseDirectory:
+                //chooseDirectory();
+              //  openFolder();
+                Intent intent = new Intent(this, DirectoryPicker.class);
+                // optionally set options here
+                startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
+                break;
+        }
+    }
+    public void openFolder()
+    {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath());
+        intent.setDataAndType(uri, "text/csv");
+        startActivity(Intent.createChooser(intent, "Open folder"));
+    }
+    private void chooseDirectory() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        Toast.makeText(this, "Choosing directory", Toast.LENGTH_SHORT).show();
+        try {
+            startActivityForResult(
+                    Intent.createChooser(intent, "Select a Directory to Upload"),
+                    DIRECTORY_SELECT_CODE);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // Potentially direct the user to the Market with a Dialog
+            Toast.makeText(this, "Please install a File Manager.",
+                    Toast.LENGTH_SHORT).show();
         }
     }
     private void showFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-
+        Log.d("showFileChooser", "showFileChooser");
         try {
             startActivityForResult(
                     Intent.createChooser(intent, "Select a File to Upload"),
@@ -118,8 +150,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          if (resultCode == RESULT_OK) {
          // Get the Uri of the selected file
          Uri uri = data.getData();
-            Log.d("SS", "File Uri: " + uri.toString());
-             File myFile = new File("/sdcard/FileNewPngImage.png");
+            Log.d("SAVINGFILE", "File Uri: " + uri.toString());
+             File myFile = new File(pathDirectory + "/Encrypted.png");
                     FileOutputStream stream = null;
                     try {
                         stream  = new FileOutputStream(myFile);
@@ -132,7 +164,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         break;
         }
+        if(requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            String path = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
+            pathDirectory = path;
+            Log.d("PATHPATH", path);
+        }
             super.onActivityResult(requestCode, resultCode, data);
+
+
         }
     private void showBytes(InputStream is, FileOutputStream stream) throws IOException{
         int bytesCounter = 0;
@@ -149,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     System.out.println();
                 }
             }
-
         is.close();
     }
     public void writeToFile(FileOutputStream fos, byte b) throws IOException
