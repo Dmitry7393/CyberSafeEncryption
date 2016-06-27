@@ -1,11 +1,14 @@
 package encryption.com.cybersafeencryption;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ButtonBarLayout;
@@ -22,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,11 +45,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnSelectFile;
     private TextView mTextViewEncrypted;
     private TextView mTextViewDecrypted;
+
+    private String[] mFileList;
+    private File mPath = new File(Environment.getExternalStorageDirectory() + "//yourdir//");
+    private String mChosenFile;
+    private static final String FTYPE = ".txt";
+    private static final int DIALOG_LOAD_FILE = 1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mEditTextKey  = (EditText) findViewById(R.id.editTextKey);
         mEditSourceText = (EditText) findViewById(R.id.editTextSourceText);
         btnEncryptText = (Button) findViewById(R.id.btnEncryptText);
@@ -59,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnEncryptText.setOnClickListener(this);
         btnDecryptText.setOnClickListener(this);
         btnSelectFile.setOnClickListener(this);
+
+
     }
 
     @Override
@@ -77,10 +89,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mTextViewDecrypted.setText(decrypt.get_text());
                 break;
             case R.id.btnChooseFile:
-               // showFileChooser();
+                showFileChooser();
               //  WriteText1();
-                Write2();
-                Log.d("WWWW", "GGGG");
+              //  Write2();
+               // Log.d("WWWW", "GGGG");
                 break;
         }
     }
@@ -107,23 +119,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          // Get the Uri of the selected file
          Uri uri = data.getData();
             Log.d("SS", "File Uri: " + uri.toString());
-             String path = "/data/data/lalallalaa.txt";
-             File file = new File(path);
-             //   File file = new File(path);
-
-                   /*  try {
-                        // if (!file.exists()) {
-                           //  file.createNewFile();
-                           //  Log.d("FILEFIL1E", "CREATION");
-                        // }
-                     } catch(IOException e) {
-
-                     }*/
-
+             File myFile = new File("/sdcard/FileNewPngImage.png");
                     FileOutputStream stream = null;
                     try {
-                     //   stream = new FileOutputStream(file);
-                        stream  = new FileOutputStream(path);
+                        stream  = new FileOutputStream(myFile);
                     } catch(FileNotFoundException e) {
                     }
              try {
@@ -138,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showBytes(InputStream is, FileOutputStream stream) throws IOException{
         int bytesCounter = 0;
         int value;
-        Log.d("IMA4512G1E", "showBytes");
         while ((value = is.read()) != -1) {
                System.out.print(String.format("0x%02X", (byte) value) );
                writeToFile(stream, (byte)value);
@@ -156,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void writeToFile(FileOutputStream fos, byte b) throws IOException
     {
-         Log.d("writeToFile4545", Byte.toString(b));
+         Log.d("writeToFile", Byte.toString(b));
             fos.write(b);
     }
     public void WriteText1() {
@@ -174,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void Write2() {
         try {
-            File myFile = new File("/sdcard/mysdfile.txt");
+            File myFile = new File("/sdcard/mysdfile.png");
             myFile.createNewFile();
             FileOutputStream fOut = new FileOutputStream(myFile);
             OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
