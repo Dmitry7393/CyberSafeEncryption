@@ -31,13 +31,26 @@
         android:layout_height="wrap_content"
         android:id="@+id/editTextSourceText" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Encrypt"
-        android:id="@+id/btnEncryptText"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Encrypt"
+            android:id="@+id/btnEncryptText"
 
-        android:layout_marginLeft="38dp"/>
+            android:layout_marginLeft="38dp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Decrypt"
+            android:id="@+id/btnDecryptText"
+            android:layout_toRightOf="@id/btnEncryptText"
+
+            android:layout_marginLeft="38dp"/>
+    </RelativeLayout>
+
 
     <TextView
         android:layout_width="match_parent"
@@ -45,35 +58,52 @@
         android:id="@+id/textViewEncrypted"
         android:textColor="#f12727" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Decrypt"
-        android:id="@+id/btnDecryptText"
 
-        android:layout_marginLeft="38dp"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textViewDecrypted"
         android:textColor="#07f50f" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select file"
-        android:id="@+id/btnChooseFile"
-        android:layout_marginLeft="38dp"/>
- />
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="some text"
         android:id="@+id/txtwrite" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select file"
+            android:id="@+id/btnChooseFile"
+            android:layout_marginLeft="38dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your_file"
+            android:layout_toRightOf="@id/btnChooseFile"
+            android:id="@+id/labelNameSourceFile" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/labelNameSourceFile"
+            android:id="@+id/editNameEncryptedFile" />
+    </RelativeLayout>
+
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="First choose directory"
+        android:layout_marginStart="150dp"
+        android:text="Encrypt files"
         android:id="@+id/btnChooseDirectory"
         android:layout_marginLeft="38dp"/>
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewSourceFiles"
+        android:textColor="#1703f2" />
 </LinearLayout>

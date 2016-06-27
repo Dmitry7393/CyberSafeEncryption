@@ -1,5 +1,6 @@
 package encryption.com.AES;
 
+import android.content.Context;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,7 +22,7 @@ public class Encrypt extends AES implements Runnable {
 	private int keySize;
 	private int Nk;
 	private int Nr;
-
+	private Context context;
 	private void createRoundKeys(String str_key) {
 		Round = new byte[Nr + 1][4][4];
 		Round = initRoundKeys(str_key, keySize, NB, Nk, Nr);
@@ -87,14 +88,56 @@ public class Encrypt extends AES implements Runnable {
 		thread = new Thread(this, "Encryption file");
 		thread.start();
 	}
+	public void EncryptSingleFile(InputStream is, FileOutputStream fos ) throws IOException {
+		int value = 0;
 
+		InputStream inputStreamImage = context.getResources().openRawResource(
+				context.getResources().getIdentifier("imageencryptedfile",
+						"raw", context.getPackageName()));
+		while ((value = inputStreamImage.read()) != -1) {
+			fos.write((byte) value);
+		}
+		inputStreamImage.close();
+
+		int j = 0;
+		int bytesCounter = 0;
+		byte block4_4[][] = new byte[4][4];
+		byte encryptedBytes[] = new byte[16];
+		byte currentBytes[] = new byte[16];
+		while ((value = is.read()) != -1) {
+			currentBytes[j] = (byte) value; // read 16 bytes
+			j++;
+			if (bytesCounter == 15) {
+				block4_4 = getBlock4_4(currentBytes, 16);
+				encryptedBytes = Encrypt_block(block4_4, "file");
+				WriteFile(fos, encryptedBytes);
+				bytesCounter = 0;
+				j = 0;
+				for (int i = 0; i < 16; i++) {
+					currentBytes[i] = 0;
+					encryptedBytes[i] = 0;
+				}
+			} else {
+				bytesCounter++;
+			}
+		}
+		// if still got content - the last a few bytes
+		if (bytesCounter != 0) {
+			block4_4 = getBlock4_4(currentBytes, 16);
+			encryptedBytes = Encrypt_block(block4_4, "file");
+			WriteFile(fos, encryptedBytes);
+		}
+		fos.close();
+		is.close();
+	}
 	/*
 	 * public void EncryptFile(File sourceFile, String outputFile) {
 	 * sourceFilesList.add(sourceFile); outputPathsList.add(outputFile); thread
 	 * = new Thread(this, "Encryption file"); thread.start(); }
 	 */
 
-	public Encrypt(String key) {
+	public Encrypt(Context current, String key) {
+		this.context = current;
 		if (key.length() <= 16) {
 			keySize = 16;
 			Nk = 4;
