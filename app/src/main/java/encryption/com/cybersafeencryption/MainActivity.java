@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mTextViewDecrypted;
     private Uri mUriSourceFile;
     private Uri mUriSingleFile;
+    private Boolean saveEncryptedFile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button   btnDecryptText = (Button) findViewById(R.id.btnDecryptText);
         Button  btnSelectFile = (Button) findViewById(R.id.btnChooseFile);
         Button  btnChooseDirectory = (Button) findViewById(R.id.btnChooseDirectory);
+        Button  btnSelectdecryptedFile = (Button) findViewById(R.id.btnSelectDecryptedFile);
+        Button  btnDecryptile = (Button) findViewById(R.id.btnDecryptFile);
 
         mTextViewEncrypted = (TextView) findViewById(R.id.textViewEncrypted);
         mTextViewDecrypted  = (TextView) findViewById(R.id.textViewDecrypted);
@@ -52,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             btnDecryptText.setOnClickListener(this);
             btnSelectFile.setOnClickListener(this);
             btnChooseDirectory.setOnClickListener(this);
+            btnSelectdecryptedFile.setOnClickListener(this);
+            btnDecryptile.setOnClickListener(this);
         }
     }
 
@@ -78,7 +83,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(this, DirectoryPicker.class);
                 // optionally set options here
                 startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
-
+                saveEncryptedFile = true;
+                break;
+            case R.id.btnDecryptFile:
+                Intent intent2 = new Intent(this, DirectoryPicker.class);
+                startActivityForResult(intent2, DirectoryPicker.PICK_DIRECTORY);
+                saveEncryptedFile = false;
                 break;
         }
     }
@@ -138,8 +148,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch(FileNotFoundException e) {
                 }
                 try {
-                    Encrypt encrypt = new Encrypt(this, mEditTextKey.getText().toString());
-                    encrypt.EncryptSingleFile(getContentResolver().openInputStream(mUriSingleFile), stream);
+                    if(saveEncryptedFile) {
+                        Encrypt encrypt = new Encrypt(this, mEditTextKey.getText().toString());
+                        encrypt.EncryptSingleFile(getContentResolver().openInputStream(mUriSingleFile), stream);
+                    } else {
+                        Decrypt decrypt = new Decrypt(mEditTextKey.getText().toString());
+                        decrypt.DecryptSingleFile(getContentResolver().openInputStream(mUriSingleFile), stream);
+                    }
+
                 } catch(IOException e) {
                 }
         }

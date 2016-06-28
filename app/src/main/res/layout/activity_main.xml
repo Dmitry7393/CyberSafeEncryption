@@ -106,4 +106,21 @@
         android:layout_height="wrap_content"
         android:id="@+id/textViewSourceFiles"
         android:textColor="#1703f2" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select files"
+            android:id="@+id/btnSelectDecryptedFile" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="150dp"
+            android:text="Decrypt files"
+            android:id="@+id/btnDecryptFile"
+            android:layout_marginLeft="38dp"/>
+    </RelativeLayout>
 </LinearLayout>

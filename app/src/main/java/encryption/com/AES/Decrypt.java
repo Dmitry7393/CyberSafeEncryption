@@ -113,7 +113,49 @@ public class Decrypt extends AES implements Runnable {
 		createRoundKeys(key);
 		CommonSizeOfFiles = 0;
 	}
+	public void DecryptSingleFile(InputStream is, FileOutputStream fos) throws IOException {
+		int bytesCounter = 0;
+		int value = 0;
+		int j = 0;
+		int countBytesInImage = 0;
+		byte tempBytes[][] = new byte[4][4];
+		byte decryptedBytes[] = new byte[16];
+		byte currentBytes[] = new byte[16];
+		while ((value = is.read()) != -1) {
+			if (countBytesInImage <= 81980)
+				countBytesInImage++;
+			if (countBytesInImage > 81980) // pass the image
+			{
+				currentBytes[j] = (byte) value; // read 16 bytes
+				j++;
+				if (bytesCounter == 15) {
+					tempBytes = getBlock4_4(currentBytes, 16);
+					decryptedBytes = Decrypt_block(tempBytes, "file");
+					WriteFile(fos, decryptedBytes);
+					bytesCounter = 0;
+					j = 0;
+					for (int i = 0; i < 16; i++) {
+						currentBytes[i] = 0;
+						decryptedBytes[i] = 0;
+					}
+				} else {
+					bytesCounter++;
+				}
+			}
 
+		}
+		// if still got content - the last a few bytes
+		if (bytesCounter != 0) {
+			for (int i = 0; i < 16; i++) {
+				decryptedBytes[i] = 0;
+			}
+			tempBytes = getBlock4_4(currentBytes, 16);
+			decryptedBytes = Decrypt_block(tempBytes, "file");
+			WriteFile(fos, decryptedBytes);
+		}
+		fos.close();
+		is.close();
+	}
 	public void convertToHex(File file, String pathNew) throws IOException {
 		InputStream is = new FileInputStream(file);
 		FileOutputStream fos = new FileOutputStream(pathNew);
