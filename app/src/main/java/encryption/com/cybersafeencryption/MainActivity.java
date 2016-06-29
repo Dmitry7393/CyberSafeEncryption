@@ -1,12 +1,9 @@
 package encryption.com.cybersafeencryption;
 
 import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +16,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import encryption.com.AES.Decrypt;
 import encryption.com.AES.Encrypt;
@@ -30,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText mEditNameEncryptedFile;
     private TextView mTextViewEncrypted;
     private TextView mTextViewDecrypted;
-    private Uri mUriSourceFile;
     private Uri mUriSingleFile;
     private Boolean saveEncryptedFile;
     @Override
@@ -50,14 +48,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTextViewEncrypted = (TextView) findViewById(R.id.textViewEncrypted);
         mTextViewDecrypted  = (TextView) findViewById(R.id.textViewDecrypted);
 
-        if(btnEncryptText != null && btnDecryptText != null) {
-            btnEncryptText.setOnClickListener(this);
-            btnDecryptText.setOnClickListener(this);
-            btnSelectFile.setOnClickListener(this);
-            btnChooseDirectory.setOnClickListener(this);
-            btnSelectdecryptedFile.setOnClickListener(this);
-            btnDecryptile.setOnClickListener(this);
+        try {
+                btnEncryptText.setOnClickListener(this);
+                btnDecryptText.setOnClickListener(this);
+                btnSelectFile.setOnClickListener(this);
+                btnChooseDirectory.setOnClickListener(this);
+                btnSelectdecryptedFile.setOnClickListener(this);
+                btnDecryptile.setOnClickListener(this);
+        } catch(java.lang.NullPointerException e) {
+
         }
+
     }
 
     @Override
@@ -115,24 +116,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          case FILE_SELECT_CODE:
          if (resultCode == RESULT_OK) {
          // Get the Uri of the selected file
-             mUriSourceFile = data.getData();
-             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && mUriSourceFile == null) {
+            Uri uri = data.getData();
+             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && uri == null) {
                  Log.d("INTO CYCLE", "RRRRRRRRRRRRRRRR");
                  ClipData clipData = data.getClipData();
                  int count = clipData.getItemCount();
                  for(int i = 0; i < count; i++) {
-                     mUriSourceFile = clipData.getItemAt(i).getUri();
-                     if (mUriSourceFile != null) {
-                         Log.d("UUUUU", mUriSourceFile.toString());
-                         startUpload(mUriSourceFile);
+                     uri = clipData.getItemAt(i).getUri();
+                     if (uri != null) {
+                         Log.d("UUUUU", uri.toString());
+                         showFileNames(uri);
                      }
                  }
              } else { //If we have single file
-                  Log.d("QQQQQQQQQ2", "WE have single file");
-                 File tf = new File(mUriSourceFile.getPath());
+                 File tf = new File(uri.getPath());
                  TextView t = (TextView) findViewById(R.id.textViewSourceFiles);
                  t.setText(tf.getName());
-                 mUriSingleFile = mUriSourceFile;
+                 mEditNameEncryptedFile.setText(tf.getName());
+                 mUriSingleFile = uri;
              }
         }
         break;
@@ -161,85 +162,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
             super.onActivityResult(requestCode, resultCode, data);
         }
-    private void  startUpload(Uri uri) {
+    private void  showFileNames(Uri uri) {
         TextView t = (TextView) findViewById(R.id.textViewSourceFiles);
-    //    Ringtone r = RingtoneManager.getRingtone(this, uri);
         File tempF = new File(uri.getPath());
         if(t != null) {
             String result = t.getText() + tempF.getName();
             t.setText(result);
         }
-    }
-
-    /*private void EncryptFile(InputStream is, FileOutputStream stream) throws IOException{
-        int bytesCounter = 0;
-        int value;
-        while ((value = is.read()) != -1) {
-               //System.out.print(String.format("0x%02X", (byte) value) );
-               writeToFile(stream, (byte)value);
-                if (bytesCounter == 15) {
-                   // System.out.println();
-                    bytesCounter = 0;
-
-                } else {
-                    bytesCounter++;
-                    //System.out.println();
-                }
-            }
-        is.close();
-    }*/
-    public void writeToFile(FileOutputStream fos, byte b) throws IOException
-    {
-            fos.write(b);
-    }
-    public static String getFileNameByUri(Context context, Uri uri)
-    {
-        String fileName="unknown";//default fileName
-        Uri filePathUri = uri;
-        if (uri.getScheme().toString().compareTo("content")==0)
-        {
-            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-            if (cursor.moveToFirst())
-            {
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);//Instead of "MediaStore.Images.Media.DATA" can be used "_data"
-                filePathUri = Uri.parse(cursor.getString(column_index));
-                fileName = filePathUri.getLastPathSegment().toString();
-            }
-        }
-        else if (uri.getScheme().compareTo("file")==0)
-        {
-            fileName = filePathUri.getLastPathSegment().toString();
-        }
-        else
-        {
-            fileName = fileName+"_"+filePathUri.getLastPathSegment();
-        }
-        return fileName;
-    }
-
-    public String getPath(Uri uri)
-    {
-        String[] projection = { MediaStore.Images.Media.DATA };
-        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-        if (cursor == null) return null;
-        int column_index =             cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String s=cursor.getString(column_index);
-        cursor.close();
-        return s;
-    }
-    public String getPath2(Uri _uri) {
-        String filePath = null;
-        Log.d("","URI = "+ _uri);
-        if (_uri != null && "content".equals(_uri.getScheme())) {
-            Cursor cursor = this.getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-            cursor.moveToFirst();
-            filePath = cursor.getString(0);
-            cursor.close();
-        } else {
-            filePath = _uri.getPath();
-        }
-        Log.d("","Chosen path = "+ filePath);
-        return filePath;
     }
 }

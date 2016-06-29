@@ -1,6 +1,8 @@
 package encryption.com.AES;
 
 import android.content.Context;
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,24 +31,17 @@ public class Encrypt extends AES implements Runnable {
 	}
 
 	private byte[] Encrypt_block(byte[][] plain_text, String typeEncryption) {
-		//show(plain_text);
 		XOR(plain_text, Round[0]);
-		System.out.println("Round " + 0);
-		show(Round[0]);
 		for (int i = 1; i < Nr; i++) {
 			SubBytes(plain_text, false);
 			ShiftRows(plain_text, false);
 			MixColumns(plain_text, false);
 			XOR(plain_text, Round[i]);
-			System.out.println("Round " + i);
-			show(Round[i]);
 		}
 		// AES Round 10 no Mix columns
 		SubBytes(plain_text, false);
 		ShiftRows(plain_text, false);
 		XOR(plain_text, Round[Nr]);
-		System.out.println("Round " + Nr);
-		show(Round[Nr]);
 		
 		byte[] ciphertextBytes = new byte[16];
 		if (typeEncryption.equals("file")) {
@@ -89,7 +84,7 @@ public class Encrypt extends AES implements Runnable {
 		thread.start();
 	}
 	public void EncryptSingleFile(InputStream is, FileOutputStream fos ) throws IOException {
-		int value = 0;
+		int value;
 
 		InputStream inputStreamImage = context.getResources().openRawResource(
 				context.getResources().getIdentifier("imageencryptedfile",
@@ -99,33 +94,16 @@ public class Encrypt extends AES implements Runnable {
 		}
 		inputStreamImage.close();
 
-		int j = 0;
-		int bytesCounter = 0;
-		byte block4_4[][] = new byte[4][4];
-		byte encryptedBytes[] = new byte[16];
-		byte currentBytes[] = new byte[16];
-		while ((value = is.read()) != -1) {
-			currentBytes[j] = (byte) value; // read 16 bytes
-			j++;
-			if (bytesCounter == 15) {
-				block4_4 = getBlock4_4(currentBytes, 16);
-				encryptedBytes = Encrypt_block(block4_4, "file");
-				WriteFile(fos, encryptedBytes);
-				bytesCounter = 0;
-				j = 0;
-				for (int i = 0; i < 16; i++) {
-					currentBytes[i] = 0;
-					encryptedBytes[i] = 0;
-				}
-			} else {
-				bytesCounter++;
-			}
-		}
-		// if still got content - the last a few bytes
-		if (bytesCounter != 0) {
+		byte block4_4[][];
+		byte encryptedBytes[];
+		byte[] currentBytes = new byte[16];
+		while ((value = is.read(currentBytes)) != -1) {
+			System.out.print(String.format("0x%02X", currentBytes[0]) + String.format("0x%02X", currentBytes[1]) + String.format("0x%02X", currentBytes[2]) + String.format("0x%02X", currentBytes[3]) + String.format("0x%02X", currentBytes[4]) +  String.format("0x%02X", currentBytes[5]) +
+					String.format("0x%02X", currentBytes[6]) + String.format("0x%02X", currentBytes[7]) + String.format("0x%02X", currentBytes[8]) + String.format("0x%02X", currentBytes[9]) + String.format("0x%02X", currentBytes[10]) + String.format("0x%02X", currentBytes[11]) + String.format("0x%02X", currentBytes[12]) +
+					String.format("0x%02X", currentBytes[13]) + String.format("0x%02X", currentBytes[14]) + String.format("0x%02X", currentBytes[15]));
 			block4_4 = getBlock4_4(currentBytes, 16);
 			encryptedBytes = Encrypt_block(block4_4, "file");
-			WriteFile(fos, encryptedBytes);
+			fos.write(encryptedBytes, 0, value);
 		}
 		fos.close();
 		is.close();
@@ -181,7 +159,7 @@ public class Encrypt extends AES implements Runnable {
 			if (bytesCounter == 15) {
 				block4_4 = getBlock4_4(currentBytes, 16);
 				encryptedBytes = Encrypt_block(block4_4, "file");
-				WriteFile(fos, encryptedBytes);
+				WriteFile(fos, encryptedBytes, value);
 				bytesCounter = 0;
 				j = 0;
 				for (int i = 0; i < 16; i++) {
@@ -197,16 +175,17 @@ public class Encrypt extends AES implements Runnable {
 		if (bytesCounter != 0) {
 			block4_4 = getBlock4_4(currentBytes, 16);
 			encryptedBytes = Encrypt_block(block4_4, "file");
-			WriteFile(fos, encryptedBytes);
+			WriteFile(fos, encryptedBytes, value);
 		}
 		fos.close();
 		is.close();
 	}
 
-	public void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException {
-		for (int i = 0; i < 16; i++) {
+	public void WriteFile(FileOutputStream fos, byte[] arrayBytes, int len) throws IOException {
+		/*for (int i = 0; i < 16; i++) {
 			fos.write(arrayBytes[i]);
-		}
+		}*/
+
 		CommonSizeOfFiles += arrayBytes.length;
 	}
 
