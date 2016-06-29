@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
            String pathDirectory = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
-            Log.d("PATH", pathDirectory);
+            Log.d("PATH1", pathDirectory);
             File myFile = new File(pathDirectory + "/" + mEditNameEncryptedFile.getText().toString());
             FileOutputStream stream = null;
                 try {

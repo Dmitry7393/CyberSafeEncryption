@@ -3,11 +3,13 @@ package encryption.com.AES;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +85,13 @@ public class Encrypt extends AES implements Runnable {
 		thread = new Thread(this, "Encryption file");
 		thread.start();
 	}
+	protected  void showPreviousBytes(byte[] plain_text) {
+		for (int j = 0; j < 16; j++) {
+			System.out.print(String.format("0x%02X", plain_text[j]));
+			System.out.print(" ");
+		}
+		System.out.println("");
+	}
 	public void EncryptSingleFile(InputStream is, FileOutputStream fos ) throws IOException {
 		int value;
 
@@ -98,12 +107,12 @@ public class Encrypt extends AES implements Runnable {
 		byte encryptedBytes[];
 		byte[] currentBytes = new byte[16];
 		while ((value = is.read(currentBytes)) != -1) {
-			System.out.print(String.format("0x%02X", currentBytes[0]) + String.format("0x%02X", currentBytes[1]) + String.format("0x%02X", currentBytes[2]) + String.format("0x%02X", currentBytes[3]) + String.format("0x%02X", currentBytes[4]) +  String.format("0x%02X", currentBytes[5]) +
-					String.format("0x%02X", currentBytes[6]) + String.format("0x%02X", currentBytes[7]) + String.format("0x%02X", currentBytes[8]) + String.format("0x%02X", currentBytes[9]) + String.format("0x%02X", currentBytes[10]) + String.format("0x%02X", currentBytes[11]) + String.format("0x%02X", currentBytes[12]) +
-					String.format("0x%02X", currentBytes[13]) + String.format("0x%02X", currentBytes[14]) + String.format("0x%02X", currentBytes[15]));
 			block4_4 = getBlock4_4(currentBytes, 16);
 			encryptedBytes = Encrypt_block(block4_4, "file");
-			fos.write(encryptedBytes, 0, value);
+			fos.write(encryptedBytes, 0, encryptedBytes.length);
+			for(int i = 0; i < currentBytes.length; i++) {
+				currentBytes[i] = 0;
+			}
 		}
 		fos.close();
 		is.close();

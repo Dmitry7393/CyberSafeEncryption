@@ -1,5 +1,7 @@
 package encryption.com.AES;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -113,45 +115,28 @@ public class Decrypt extends AES implements Runnable {
 		createRoundKeys(key);
 		CommonSizeOfFiles = 0;
 	}
-	public void DecryptSingleFile(InputStream is, FileOutputStream fos) throws IOException {
-		int bytesCounter = 0;
-		int value = 0;
-		int j = 0;
-		int countBytesInImage = 0;
-		byte tempBytes[][] = new byte[4][4];
-		byte decryptedBytes[] = new byte[16];
-		byte currentBytes[] = new byte[16];
-		while ((value = is.read()) != -1) {
-			if (countBytesInImage <= 81980)
-				countBytesInImage++;
-			if (countBytesInImage > 81980) // pass the image
-			{
-				currentBytes[j] = (byte) value; // read 16 bytes
-				j++;
-				if (bytesCounter == 15) {
-					tempBytes = getBlock4_4(currentBytes, 16);
-					decryptedBytes = Decrypt_block(tempBytes, "file");
-					WriteFile(fos, decryptedBytes);
-					bytesCounter = 0;
-					j = 0;
-					for (int i = 0; i < 16; i++) {
-						currentBytes[i] = 0;
-						decryptedBytes[i] = 0;
-					}
-				} else {
-					bytesCounter++;
-				}
-			}
-
+	protected  void showPreviousBytes(byte[] plain_text) {
+		for (int j = 0; j < 16; j++) {
+			System.out.print(String.format("0x%02X", plain_text[j]));
+			System.out.print(" ");
 		}
-		// if still got content - the last a few bytes
-		if (bytesCounter != 0) {
-			for (int i = 0; i < 16; i++) {
-				decryptedBytes[i] = 0;
-			}
+		System.out.println("");
+	}
+	public void DecryptSingleFile(InputStream is, FileOutputStream fos) throws IOException {
+		int value;
+		byte tempBytes[][];
+		byte decryptedBytes[];
+		byte currentBytes[] = new byte[16];
+
+		long countBytesSkip = is.skip(81980);
+		Log.d("SKIP", Long.toString(countBytesSkip));
+		while ((value = is.read(currentBytes)) != -1) {
 			tempBytes = getBlock4_4(currentBytes, 16);
 			decryptedBytes = Decrypt_block(tempBytes, "file");
-			WriteFile(fos, decryptedBytes);
+			fos.write(decryptedBytes, 0, decryptedBytes.length);
+			for (int i = 0; i < 16; i++) {
+				currentBytes[i] = 0;
+			}
 		}
 		fos.close();
 		is.close();
