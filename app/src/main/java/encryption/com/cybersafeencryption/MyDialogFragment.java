@@ -1,15 +1,14 @@
 package encryption.com.cybersafeencryption;
 
-import android.annotation.SuppressLint;
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -19,7 +18,6 @@ import java.util.List;
 public class MyDialogFragment extends DialogFragment implements
         OnItemClickListener {
 
-    String[] listitems = { "item01", "item02", "item03", "item04" };
     List<Note> mListNotes;
     ListView mylist;
 
@@ -39,29 +37,19 @@ public class MyDialogFragment extends DialogFragment implements
 
         super.onActivityCreated(savedInstanceState);
 
-      //  ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-        //        android.R.layout.simple_list_item_1, listitems);
         mListNotes = new ArrayList<>();
-        Note myNote = new Note();
-        myNote.setTitleNote("first");
-        myNote.setNote("some information");
-        myNote.setDate("19:22");
+        mListNotes = ((EncryptTextActivity)getActivity()).getlistOfNotes();
 
-        mListNotes.add(myNote);
         ListNotesViewAdapter customAdapter = new ListNotesViewAdapter(getActivity().getApplicationContext(), R.layout.item_notes, mListNotes);
-
         mylist.setAdapter(customAdapter);
-
         mylist.setOnItemClickListener(this);
-
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
-
         dismiss();
-        Toast.makeText(getActivity(), listitems[position], Toast.LENGTH_SHORT)
+        Toast.makeText(getActivity(), mListNotes.get(position).getTitleNote(), Toast.LENGTH_SHORT)
                 .show();
     }
 

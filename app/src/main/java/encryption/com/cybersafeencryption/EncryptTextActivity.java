@@ -2,23 +2,24 @@ package encryption.com.cybersafeencryption;
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import encryption.com.AES.Decrypt;
 import encryption.com.AES.Encrypt;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import encryption.com.Database.*;
 
@@ -27,8 +28,8 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
     private EditText mTextViewEncrypted;
     private EditText mTextViewDecrypted;
     private EditText mEditSourceText;
-    final String LOG_TAG = "myLogs";
-
+    final String LOG_TAG = "myLohs67";
+    protected List<Note> mListNotes;
     DBHelper dbHelper;
     DialogFragment dlg1;
     @Override
@@ -55,6 +56,7 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
             btnSaveNote.setOnClickListener(this);
             btnOpenAllNotes.setOnClickListener(this);
         }
+        mListNotes = new ArrayList<>();
         dbHelper = new DBHelper(this);
         dlg1 = new Dialog1();
     }
@@ -81,13 +83,13 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
                 startActivity(Intent.createChooser(sendIntent, "Share the program:"));
                 break;
             case R.id.button_save_note:
-                // Supply num input as an argument.
                 Bundle args = new Bundle();
                 args.putString("text", mTextViewEncrypted.getText().toString());
                 dlg1.setArguments(args);
                 dlg1.show(getFragmentManager(), "dlg1");
                 break;
             case R.id.button_watch_all_notes:
+                updateListNotes();
                 FragmentManager manager = getFragmentManager();
                 MyDialogFragment dialog = new MyDialogFragment();
                 dialog.show(manager, "dialog");
@@ -95,29 +97,7 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
 
         }
 
-                   /* Log.d(LOG_TAG, "--- Rows in table_notes: ---");
-                    // делаем запрос всех данных из таблицы mytable, получаем Cursor
-                    Cursor c = db.query("table_notes", null, null, null, null, null, null);
 
-                    // ставим позицию курсора на первую строку выборки
-                    // если в выборке нет строк, вернется false
-                    if (c.moveToFirst()) {
-                        // определяем номера столбцов по имени в выборке
-                        int idColIndex = c.getColumnIndex("id");
-                        int noteColIndex = c.getColumnIndex("note");
-                        int hintColIndex = c.getColumnIndex("hint");
-                        int dateColIndex = c.getColumnIndex("date");
-                        do {
-                            // получаем значения по номерам столбцов и пишем все в лог
-                            Log.d(LOG_TAG,
-                                    "ID = " + c.getInt(idColIndex) +
-                                            ", note = " + c.getString(noteColIndex) +
-                                            ", hint = " + c.getString(hintColIndex) +
-                                            ", date = " + c.getString(dateColIndex));
-                        } while (c.moveToNext());
-                    } else
-                        Log.d(LOG_TAG, "0 rows");
-                    c.close();*/
 
                  /*   Log.d(LOG_TAG, "--- Clear mytable: ---");
                     // удаляем все записи
@@ -128,13 +108,41 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
             // закрываем подключение к БД
          //   dbHelper.close();
         }
+    private void updateListNotes() {
+        // создаем объект для данных
+        ContentValues cv = new ContentValues();
+        // подключаемся к БД
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+          Log.d(LOG_TAG, "READ ROWS FROM DATABASE12");
+                    // делаем запрос всех данных из таблицы mytable, получаем Cursor
+                    Cursor c = db.query("table_notes", null, null, null, null, null, null);
 
+                    // ставим позицию курсора на первую строку выборки
+                    // если в выборке нет строк, вернется false
+                    if (c.moveToFirst()) {
+                        // определяем номера столбцов по имени в выборке
+                        int idColIndex = c.getColumnIndex("id");
+                        int titleNoteColIndex = c.getColumnIndex("title_note");
+                        int noteColIndex = c.getColumnIndex("note");
+                        int dateColIndex = c.getColumnIndex("date");
+                        do {
+                            Note tempNote = new Note();
+                            tempNote.setTitleNote(c.getString(titleNoteColIndex));
+                            tempNote.setNote(c.getString(noteColIndex));
+                            tempNote.setDate(c.getString(dateColIndex));
+
+                            mListNotes.add(tempNote);
+                        } while (c.moveToNext());
+                    } else
+                        Log.d(LOG_TAG, "0 rows");
+                    c.close();
+    }
     protected void saveNote(String titleNote, String note) {
         // создаем объект для данных
         ContentValues cv = new ContentValues();
         // подключаемся к БД
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Log.d(LOG_TAG, "--- Insert in table_notes2323: ---");
+        Log.d(LOG_TAG, "--- Inser23t in2 table_notes2323: ---");
         String date =  java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
         cv.put("title_note", titleNote);
         cv.put("note", note);
@@ -144,6 +152,9 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
         Log.d(LOG_TAG, "row inserted, ID = " + rowID);
 
         db.close();
+    }
+    protected List<Note> getlistOfNotes() {
+        return mListNotes;
     }
 }
 
