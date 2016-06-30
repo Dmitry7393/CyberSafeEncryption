@@ -63,15 +63,35 @@
         android:id="@+id/editViewDecrypted"
         android:textColor="#07f50f" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Send SMS"
-        android:id="@+id/button_send_sms" />
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Сохранить"
+            android:id="@+id/button_save_note" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:text="Отправить ..."
+            android:id="@+id/button_send_social_network" />
+    </LinearLayout>
+
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Share ..."
-        android:id="@+id/button_send_social_network" />
+        android:layout_marginTop="50dp"
+        android:text="Все заметки"
+        android:id="@+id/button_watch_all_notes" />
+
+    <fragment android:name="encryption.com.cybersafeencryption.FragmentListView"
+        android:id="@+id/fragment_view_notes"
+        android:layout_weight="2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
 </LinearLayout>

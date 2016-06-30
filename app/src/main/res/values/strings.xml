@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">CyberSafeEncryption</string>
+    <string name="dialog_1">Dialog 1</string>
+    <string name="dialog_2">Dialog 2</string>
+    <string name="message_text">Enter a name for the note</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="maybe">Maybe</string>
 </resources>
