@@ -13,11 +13,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MyDialogFragment extends DialogFragment implements
         OnItemClickListener {
 
     String[] listitems = { "item01", "item02", "item03", "item04" };
-
+    List<Note> mListNotes;
     ListView mylist;
 
     @Override
@@ -36,10 +39,18 @@ public class MyDialogFragment extends DialogFragment implements
 
         super.onActivityCreated(savedInstanceState);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, listitems);
+      //  ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+        //        android.R.layout.simple_list_item_1, listitems);
+        mListNotes = new ArrayList<>();
+        Note myNote = new Note();
+        myNote.setTitleNote("first");
+        myNote.setNote("some information");
+        myNote.setDate("19:22");
 
-        mylist.setAdapter(adapter);
+        mListNotes.add(myNote);
+        ListNotesViewAdapter customAdapter = new ListNotesViewAdapter(getActivity().getApplicationContext(), R.layout.item_notes, mListNotes);
+
+        mylist.setAdapter(customAdapter);
 
         mylist.setOnItemClickListener(this);
 

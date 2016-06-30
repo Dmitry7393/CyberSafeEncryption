@@ -88,10 +88,4 @@
         android:layout_marginTop="50dp"
         android:text="Все заметки"
         android:id="@+id/button_watch_all_notes" />
-
-    <fragment android:name="encryption.com.cybersafeencryption.FragmentListView"
-        android:id="@+id/fragment_view_notes"
-        android:layout_weight="2"
-        android:layout_width="0dp"
-        android:layout_height="match_parent" />
 </LinearLayout>

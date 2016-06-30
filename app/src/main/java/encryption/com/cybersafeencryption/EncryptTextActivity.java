@@ -88,13 +88,7 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
                 dlg1.show(getFragmentManager(), "dlg1");
                 break;
             case R.id.button_watch_all_notes:
-              /*  FragmentListView fragmentListView = new FragmentListView();
-                Log.d("MMMMM", "Open new note");
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.add(R.id.fragment_view_notes, fragmentListView);
-                ft.commit();*/
                 FragmentManager manager = getFragmentManager();
-
                 MyDialogFragment dialog = new MyDialogFragment();
                 dialog.show(manager, "dialog");
                 break;
