@@ -1,15 +1,10 @@
 package encryption.com.AES;
 
 import android.content.Context;
-import android.util.Log;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import android.net.Uri;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +13,8 @@ public class Encrypt extends AES implements Runnable {
 	private String cipherTextBase64 = "";
 	private byte Round[][][];
 	private ArrayList<Byte> arrayListBytes = new ArrayList<Byte>();
-	private List<File> sourceFilesList = new ArrayList<File>();
+
+	private List<Uri> sourceFilesList = new ArrayList<Uri>();
 	private List<String> outputPathsList = new ArrayList<String>();
 	private long CommonSizeOfFiles = 0;
 	private double timeEcryption = 0;
@@ -67,7 +63,7 @@ public class Encrypt extends AES implements Runnable {
 	}
 
 	public void EncryptText(String str_plain_text) {
-		int r = 0;
+		int r;
 		cipherTextBase64 = "";
 		for (int i = 0; i < str_plain_text.length(); i += 16) {
 			r = str_plain_text.length() - i;
@@ -79,10 +75,10 @@ public class Encrypt extends AES implements Runnable {
 		}
 	}
 
-	public void EncryptGroupsOfFiles(List<File> sourceFile, List<String> outputPath) {
+	public void EncryptGroupsOfFiles(List<Uri> sourceFile, List<String> outputPath) {
 		this.sourceFilesList = sourceFile;
 		this.outputPathsList = outputPath;
-		thread = new Thread(this, "Encryption file");
+		thread = new Thread(this, "Encryption file1");
 		thread.start();
 	}
 	protected  void showPreviousBytes(byte[] plain_text) {
@@ -92,9 +88,11 @@ public class Encrypt extends AES implements Runnable {
 		}
 		System.out.println("");
 	}
-	public void EncryptSingleFile(InputStream is, FileOutputStream fos ) throws IOException {
-		int value;
+	public void EncryptFile(Uri uri, String pathOutput) throws IOException {
 
+		InputStream is = context.getContentResolver().openInputStream(uri);
+		FileOutputStream fos = new FileOutputStream(pathOutput);
+		int value;
 		InputStream inputStreamImage = context.getResources().openRawResource(
 				context.getResources().getIdentifier("imageencryptedfile",
 						"raw", context.getPackageName()));
@@ -107,6 +105,7 @@ public class Encrypt extends AES implements Runnable {
 		byte encryptedBytes[];
 		byte[] currentBytes = new byte[16];
 		while ((value = is.read(currentBytes)) != -1) {
+			showPreviousBytes(currentBytes);
 			block4_4 = getBlock4_4(currentBytes, 16);
 			encryptedBytes = Encrypt_block(block4_4, "file");
 			fos.write(encryptedBytes, 0, encryptedBytes.length);
@@ -117,11 +116,6 @@ public class Encrypt extends AES implements Runnable {
 		fos.close();
 		is.close();
 	}
-	/*
-	 * public void EncryptFile(File sourceFile, String outputFile) {
-	 * sourceFilesList.add(sourceFile); outputPathsList.add(outputFile); thread
-	 * = new Thread(this, "Encryption file"); thread.start(); }
-	 */
 
 	public Encrypt(Context current, String key) {
 		this.context = current;
@@ -144,60 +138,6 @@ public class Encrypt extends AES implements Runnable {
 		CommonSizeOfFiles = 81980;
 	}
 
-	public void convertToHex(File file, String pathNew) throws IOException {
-		InputStream is = new FileInputStream(file);
-		FileOutputStream fos = new FileOutputStream(pathNew);
-		int value = 0;
-
-		// First write bytes from image imageEncryptedFile.png to new file
-		InputStream inputStreamImage = Encrypt.class.getResourceAsStream("/resources/imageEncryptedFile.png");
-		while ((value = inputStreamImage.read()) != -1) {
-			fos.write((byte) value);
-		}
-		inputStreamImage.close();
-
-		int j = 0;
-		int bytesCounter = 0;
-		value = 0;
-		byte block4_4[][] = new byte[4][4];
-		byte encryptedBytes[] = new byte[16];
-		byte currentBytes[] = new byte[16];
-		while ((value = is.read()) != -1) {
-			currentBytes[j] = (byte) value; // read 16 bytes
-			j++;
-			if (bytesCounter == 15) {
-				block4_4 = getBlock4_4(currentBytes, 16);
-				encryptedBytes = Encrypt_block(block4_4, "file");
-				WriteFile(fos, encryptedBytes, value);
-				bytesCounter = 0;
-				j = 0;
-				for (int i = 0; i < 16; i++) {
-					currentBytes[i] = 0;
-					encryptedBytes[i] = 0;
-				}
-
-			} else {
-				bytesCounter++;
-			}
-		}
-		// if still got content - the last a few bytes
-		if (bytesCounter != 0) {
-			block4_4 = getBlock4_4(currentBytes, 16);
-			encryptedBytes = Encrypt_block(block4_4, "file");
-			WriteFile(fos, encryptedBytes, value);
-		}
-		fos.close();
-		is.close();
-	}
-
-	public void WriteFile(FileOutputStream fos, byte[] arrayBytes, int len) throws IOException {
-		/*for (int i = 0; i < 16; i++) {
-			fos.write(arrayBytes[i]);
-		}*/
-
-		CommonSizeOfFiles += arrayBytes.length;
-	}
-
 	public String getCipherText() {
 		byte tempBytes[] = new byte[arrayListBytes.size()];
 		for (int i = 0; i < arrayListBytes.size(); i++) {
@@ -213,8 +153,8 @@ public class Encrypt extends AES implements Runnable {
 		for (int i = 0; i < sourceFilesList.size(); i++) {
 			if (!Thread.currentThread().isInterrupted()) {
 				try {
-					System.out.println("thread works");
-					convertToHex(sourceFilesList.get(i), outputPathsList.get(i));
+					System.out.println("thread wo1rks1");
+					EncryptFile(sourceFilesList.get(i), outputPathsList.get(i));
 				} catch (IOException e) {
 				}
 			}
