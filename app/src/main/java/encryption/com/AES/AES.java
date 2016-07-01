@@ -328,7 +328,6 @@ public class AES {
 	}
 
 	public static byte[] Base64ToByte(String myText) {
-		byte[] decoded = Base64.decode(myText, Base64.NO_PADDING);
-		return decoded;
+		return Base64.decode(myText, Base64.NO_PADDING);
 	}
 }

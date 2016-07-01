@@ -26,7 +26,8 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
+        android:inputType="textMultiLine"
         android:id="@+id/editTextSourceText" />
 
     <RelativeLayout
@@ -52,16 +53,10 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editViewEncrypted"
+        android:layout_height="100dp"
+        android:id="@+id/editViewOutputText"
         android:textColor="#f12727" />
 
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editViewDecrypted"
-        android:textColor="#07f50f" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,22 +65,23 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Сохранить"
+            android:text="Save note"
             android:id="@+id/button_save_note" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:text="Отправить ..."
+            android:layout_marginLeft="5dp"
+            android:text="Send ..."
             android:id="@+id/button_send_social_network" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All notes"
+            android:id="@+id/button_watch_all_notes" />
     </LinearLayout>
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Все заметки"
-        android:id="@+id/button_watch_all_notes" />
+
 </LinearLayout>
