@@ -24,7 +24,9 @@ import encryption.com.cybersafeencryption.R;
 
 public class DialogFragmentListNotes extends DialogFragment implements
         OnItemClickListener, View.OnClickListener {
+
     ListNotesViewAdapter customAdapter;
+
     public interface EditNameDialogListener {
         void onFinishEditDialog(String inputText);
         void deleteNotes(List<Note> listNotes);
@@ -33,15 +35,17 @@ public class DialogFragmentListNotes extends DialogFragment implements
     List<Note> mListNotes;
     ListView mylist;
     TextView txtViewNote;
+    Button btnDelete;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_fragment, null, false);
 
-        Button btnDelete = (Button) view.findViewById(R.id.button_delete_note);
+         btnDelete = (Button) view.findViewById(R.id.button_delete_note);
         btnDelete.setOnClickListener(this);
 
         mylist = (ListView) view.findViewById(R.id.listDFragment);
+
 
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         return view;
@@ -63,6 +67,9 @@ public class DialogFragmentListNotes extends DialogFragment implements
         mListNotes = new ArrayList<>();
         mListNotes = ((EncryptTextActivity)getActivity()).getlistOfNotes();
 
+        if(mListNotes.size() == 0) {
+            btnDelete.setVisibility(View.INVISIBLE);
+        }
         customAdapter = new ListNotesViewAdapter(getActivity().getApplicationContext(), R.layout.item_notes, mListNotes);
         mylist.setAdapter(customAdapter);
         mylist.setOnItemClickListener(this);
@@ -70,9 +77,8 @@ public class DialogFragmentListNotes extends DialogFragment implements
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d("VVVVVVVV", "SSSSSSS");
         view.setSelected(true);
-        txtViewNote = (TextView) view.findViewById(R.id.txt_view__note);
+        txtViewNote = (TextView) view.findViewById(R.id.txt_view_note);
         EditNameDialogListener activity = (EditNameDialogListener) getActivity();
         activity.onFinishEditDialog(txtViewNote.getText().toString());
 

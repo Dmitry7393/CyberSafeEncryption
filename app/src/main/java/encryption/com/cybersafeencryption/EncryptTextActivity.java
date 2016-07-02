@@ -151,9 +151,7 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
         cv.put("note", note);
         cv.put("date", date);
         // вставляем запись и получаем ее ID
-        long rowID = db.insert("table_notes", null, cv);
-        Log.d(LOG_TAG, "row inserted, ID = " + rowID);
-
+        db.insert("table_notes", null, cv);
         db.close();
     }
     public List<Note> getlistOfNotes() {
@@ -164,43 +162,17 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
     }
 
     public void deleteNotes(List<Note> listNotes) {
-        Log.d("CCCCCC", "class EncryptTextActivity");
         for(int i = 0; i < listNotes.size(); i++) {
             if(listNotes.get(i).getCheckBox()) {
-                Log.d("delete item ", Integer.toString(i));
                 deleteNoteFromDB(listNotes.get(i).getDate());
             }
         }
     }
-    /*private void getID(String date) {
-        // подключаемся к БД
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.query("table_notes", null, null, null, null, null, null);
-        if (c.moveToFirst()) {
-            // определяем номера столбцов по имени в выборке
-            int titleNoteColIndex = c.getColumnIndex("title_note");
-            int noteColIndex = c.getColumnIndex("note");
-            int dateColIndex = c.getColumnIndex("date");
-            do {
-                Note tempNote = new Note();
-                tempNote.setTitleNote(c.getString(titleNoteColIndex));
-                tempNote.setNote(c.getString(noteColIndex));
-                tempNote.setDate(c.getString(dateColIndex));
 
-                mListNotes.add(tempNote);
-            } while (c.moveToNext());
-        } else
-            Log.d(LOG_TAG, "0 rows");
-        c.close();
-    }*/
-    private void deleteNoteFromDB(String date1) {
+    private void deleteNoteFromDB(String date) {
         Log.d("DE233223L", "3333333333333");
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        // удаляем по id
-       // db.delete("table_notes ", "date = " + date, null);
-      //  db.delete("table_notes", "date = " + new String[] {date1}, null);
-        db.delete("table_notes", "date" + " = ?", new String[] { date1 });
+        db.delete("table_notes", "date" + " = ?", new String[] { date });
         db.close();
     }
 }
-

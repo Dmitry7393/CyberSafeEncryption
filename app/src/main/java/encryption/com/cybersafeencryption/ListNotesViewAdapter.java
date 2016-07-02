@@ -50,9 +50,9 @@ public class ListNotesViewAdapter extends ArrayAdapter<Note> {
     OnCheckedChangeListener myCheckChangList = new OnCheckedChangeListener() {
         public void onCheckedChanged(CompoundButton buttonView,
                                      boolean isChecked) {
+            buttonView.setSelected(true);
             int position = (Integer) buttonView.getTag();
             mListData.get(position).setCheckBox();
-            Log.d("WWWWWwWw", Integer.toString(position));
         }
     };
     private class ViewHolder {
@@ -62,7 +62,7 @@ public class ListNotesViewAdapter extends ArrayAdapter<Note> {
 
         public ViewHolder(View itemView) {
             vTitleNote = (TextView) itemView.findViewById(R.id.txt_view_title_note);
-            vNote = (TextView) itemView.findViewById(R.id.txt_view__note);
+            vNote = (TextView) itemView.findViewById(R.id.txt_view_note);
             vDate = (TextView) itemView.findViewById(R.id.txt_view_date);
         }
 
