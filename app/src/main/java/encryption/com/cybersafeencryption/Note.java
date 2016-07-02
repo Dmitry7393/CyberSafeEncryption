@@ -4,6 +4,11 @@ public class Note {
     private String titleNote;
     private String note;
     private String date;
+    private boolean checkBox = false;
+
+    public void setCheckBox() {
+        checkBox = !checkBox;
+    }
     public void setTitleNote(String s) {
         titleNote = s;
     }
@@ -21,5 +26,8 @@ public class Note {
     }
     public String getDate() {
         return date;
+    }
+    public boolean getCheckBox() {
+        return checkBox;
     }
 }

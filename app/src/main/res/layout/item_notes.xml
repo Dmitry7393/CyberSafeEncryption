@@ -18,6 +18,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/txt_view_date"/>
-
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkbox"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="checkbox"/>
 
 </LinearLayout>

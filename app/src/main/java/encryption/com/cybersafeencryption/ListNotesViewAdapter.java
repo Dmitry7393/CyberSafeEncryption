@@ -1,12 +1,17 @@
 package encryption.com.cybersafeencryption;
 
+import android.app.DialogFragment;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +22,9 @@ public class ListNotesViewAdapter extends ArrayAdapter<Note> {
         super(context, resource, items);
         mListData = items;
     }
-
+    public List<Note> getUpdatedListNote() {
+        return mListData;
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View itemView = convertView;
@@ -30,11 +37,24 @@ public class ListNotesViewAdapter extends ArrayAdapter<Note> {
         } else {
             holder = (ViewHolder) itemView.getTag();
         }
+        CheckBox cb = (CheckBox) itemView.findViewById(R.id.checkbox);
+        // присваиваем чекбоксу обработчик
+        cb.setOnCheckedChangeListener(myCheckChangList);
+        // пишем позицию
+        cb.setTag(position);
 
         holder.setData(position);
         return itemView;
     }
-
+    // обработчик для чекбоксов
+    OnCheckedChangeListener myCheckChangList = new OnCheckedChangeListener() {
+        public void onCheckedChanged(CompoundButton buttonView,
+                                     boolean isChecked) {
+            int position = (Integer) buttonView.getTag();
+            mListData.get(position).setCheckBox();
+            Log.d("WWWWWwWw", Integer.toString(position));
+        }
+    };
     private class ViewHolder {
         private TextView vTitleNote;
         private TextView vNote;

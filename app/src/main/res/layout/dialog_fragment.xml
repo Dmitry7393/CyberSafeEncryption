@@ -4,12 +4,19 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_marginLeft="5dp"
-    android:layout_marginRight="5dp" >
+    android:layout_marginRight="5dp"
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/listDFragment"
         android:layout_width="match_parent"
+        android:choiceMode="singleChoice"
+        android:listSelector="#f50303"
         android:layout_height="match_parent" >
     </ListView>
-
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_delete_note"
+        android:text="Delete note"/>
 </LinearLayout>

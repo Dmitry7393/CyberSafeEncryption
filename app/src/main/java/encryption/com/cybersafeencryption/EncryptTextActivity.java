@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,12 +21,13 @@ import java.util.Calendar;
 import java.util.List;
 
 import encryption.com.Database.*;
+import encryption.com.dialogs.DialogFragmentListNotes;
 
-public class EncryptTextActivity extends AppCompatActivity  implements View.OnClickListener, MyDialogFragment.EditNameDialogListener {
+public class EncryptTextActivity extends AppCompatActivity  implements View.OnClickListener, DialogFragmentListNotes.EditNameDialogListener {
     private EditText mEditTextKey;
     private EditText mTextViewOutputText;
     private EditText mEditSourceText;
-    final String LOG_TAG = "myLohs67";
+    final String LOG_TAG = "myLohs167";
     protected List<Note> mListNotes;
     DBHelper dbHelper;
     DialogFragment dlg1;
@@ -97,7 +97,7 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
             case R.id.button_watch_all_notes:
                 updateListNotes();
                 FragmentManager manager = getFragmentManager();
-                MyDialogFragment dialog = new MyDialogFragment();
+                DialogFragmentListNotes dialog = new DialogFragmentListNotes();
                 dialog.show(manager, "dialog");
                 break;
 
@@ -156,11 +156,51 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
 
         db.close();
     }
-    protected List<Note> getlistOfNotes() {
+    public List<Note> getlistOfNotes() {
         return mListNotes;
     }
-   public  void onFinishEditDialog(String inputText) {
+     public  void onFinishEditDialog(String inputText) {
        mEditSourceText.setText(inputText);
+    }
+
+    public void deleteNotes(List<Note> listNotes) {
+        Log.d("CCCCCC", "class EncryptTextActivity");
+        for(int i = 0; i < listNotes.size(); i++) {
+            if(listNotes.get(i).getCheckBox()) {
+                Log.d("delete item ", Integer.toString(i));
+                deleteNoteFromDB(listNotes.get(i).getDate());
+            }
+        }
+    }
+    /*private void getID(String date) {
+        // подключаемся к БД
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor c = db.query("table_notes", null, null, null, null, null, null);
+        if (c.moveToFirst()) {
+            // определяем номера столбцов по имени в выборке
+            int titleNoteColIndex = c.getColumnIndex("title_note");
+            int noteColIndex = c.getColumnIndex("note");
+            int dateColIndex = c.getColumnIndex("date");
+            do {
+                Note tempNote = new Note();
+                tempNote.setTitleNote(c.getString(titleNoteColIndex));
+                tempNote.setNote(c.getString(noteColIndex));
+                tempNote.setDate(c.getString(dateColIndex));
+
+                mListNotes.add(tempNote);
+            } while (c.moveToNext());
+        } else
+            Log.d(LOG_TAG, "0 rows");
+        c.close();
+    }*/
+    private void deleteNoteFromDB(String date1) {
+        Log.d("DE233223L", "3333333333333");
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        // удаляем по id
+       // db.delete("table_notes ", "date = " + date, null);
+      //  db.delete("table_notes", "date = " + new String[] {date1}, null);
+        db.delete("table_notes", "date" + " = ?", new String[] { date1 });
+        db.close();
     }
 }
 
