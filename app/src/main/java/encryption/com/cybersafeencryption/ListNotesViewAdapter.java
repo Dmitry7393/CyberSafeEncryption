@@ -50,7 +50,7 @@ public class ListNotesViewAdapter extends ArrayAdapter<Note> {
     OnCheckedChangeListener myCheckChangList = new OnCheckedChangeListener() {
         public void onCheckedChanged(CompoundButton buttonView,
                                      boolean isChecked) {
-            buttonView.setSelected(true);
+          //  buttonView.setSelected(true);
             int position = (Integer) buttonView.getTag();
             mListData.get(position).setCheckBox();
         }

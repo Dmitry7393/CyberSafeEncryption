@@ -95,10 +95,7 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
                 dlg1.show(getFragmentManager(), "dlg1");
                 break;
             case R.id.button_watch_all_notes:
-                updateListNotes();
-                FragmentManager manager = getFragmentManager();
-                DialogFragmentListNotes dialog = new DialogFragmentListNotes();
-                dialog.show(manager, "dialog");
+                openAllNotes();
                 break;
 
         }
@@ -114,6 +111,16 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
             // закрываем подключение к БД
          //   dbHelper.close();
         }
+    private void openAllNotes() {
+        updateListNotes();
+        if(mListNotes.size() == 0) {
+            Toast.makeText(this, "List wth notes is empty", Toast.LENGTH_SHORT).show();
+        } else {
+            FragmentManager manager = getFragmentManager();
+            DialogFragmentListNotes dialog = new DialogFragmentListNotes();
+            dialog.show(manager, "dialog");
+        }
+    }
     private void updateListNotes() {
         // подключаемся к БД
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -169,10 +176,11 @@ public class EncryptTextActivity extends AppCompatActivity  implements View.OnCl
         }
     }
 
-    private void deleteNoteFromDB(String date) {
-        Log.d("DE233223L", "3333333333333");
+    public void deleteNoteFromDB(String date) {
+        Log.d("DE233223L", "99999999");
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete("table_notes", "date" + " = ?", new String[] { date });
         db.close();
+        openAllNotes();
     }
 }
