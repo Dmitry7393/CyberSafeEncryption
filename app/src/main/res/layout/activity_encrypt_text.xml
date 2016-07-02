@@ -8,19 +8,25 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@drawable/main_activity_gradient"
     tools:context="encryption.com.cybersafeencryption.EncryptTextActivity">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Enter the key"
+        android:textSize="20dp"
+        android:textColor="#05035e"
         android:id="@+id/labelKey" />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextKey" />
+        android:id="@+id/editTextKey"
+        android:textSize="18sp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:textColor="#05035e"
         android:text="Enter your text"
         android:id="@+id/label2" />
 
@@ -28,17 +34,24 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:inputType="textMultiLine"
-        android:id="@+id/editTextSourceText" />
+        android:id="@+id/editTextSourceText"
+        android:textSize="18sp"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
+            android:id="@+id/btnEncryptText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Encrypt"
-            android:id="@+id/btnEncryptText"
+            android:textColor="#ffffff"
 
+            android:background="@drawable/buttonshapeencrypt"
+            android:shadowColor="#A8A8A8"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="5"
             android:layout_marginLeft="38dp"/>
         <Button
             android:layout_width="wrap_content"
@@ -47,6 +60,12 @@
             android:id="@+id/btnDecryptText"
             android:layout_toEndOf="@id/btnEncryptText"
             android:layout_toRightOf="@id/btnEncryptText"
+            android:background="@drawable/buttonshapeencrypt"
+            android:textColor="#ffffff"
+            android:shadowColor="#A8A8A8"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="5"
             android:layout_marginLeft="38dp"/>
     </RelativeLayout>
 
@@ -55,7 +74,8 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:id="@+id/editViewOutputText"
-        android:textColor="#f12727" />
+        android:textColor="#030303"
+        android:textSize="20sp"/>
 
 
     <LinearLayout
@@ -66,20 +86,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save note"
-            android:id="@+id/button_save_note" />
+            android:id="@+id/button_save_note"
+            android:background="@drawable/buttonshapeencrypt"
+            android:textColor="#ffffff"
+            android:shadowColor="#A8A8A8"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="5"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:text="Send ..."
-            android:id="@+id/button_send_social_network" />
+            android:id="@+id/button_send_social_network"
+            android:background="@drawable/buttonshapeencrypt"
+            android:textColor="#ffffff"
+            android:shadowColor="#A8A8A8"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="5"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="All notes"
-            android:id="@+id/button_watch_all_notes" />
+            android:layout_marginLeft="5dp"
+            android:id="@+id/button_watch_all_notes"
+            android:background="@drawable/buttonshapeencrypt"
+            android:textColor="#ffffff"
+            android:shadowColor="#A8A8A8"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="5"/>
     </LinearLayout>
 
 

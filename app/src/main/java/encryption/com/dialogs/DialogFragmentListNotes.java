@@ -2,24 +2,19 @@ package encryption.com.dialogs;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import encryption.com.cybersafeencryption.EncryptTextActivity;
 import encryption.com.cybersafeencryption.ListNotesViewAdapter;
 import encryption.com.cybersafeencryption.Note;
@@ -47,14 +42,7 @@ public class DialogFragmentListNotes extends DialogFragment implements
         View view = inflater.inflate(R.layout.dialog_fragment, null, false);
 
         mylist = (ListView) view.findViewById(R.id.listDFragment);
-        mylist.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
-            public boolean onItemLongClick(AdapterView<?> arg0, View v,
-                                           int index, long arg3) {
-                createAlertDialog(index);
-                return false;
-            }
-        });
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         return view;
     }
@@ -96,8 +84,7 @@ public class DialogFragmentListNotes extends DialogFragment implements
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //view.setSelected(true);
-        Log.d("FIRST","SSSSS67223s");
         txtViewNote = (TextView) view.findViewById(R.id.txt_view_note);
+        createAlertDialog(position);
     }
 }

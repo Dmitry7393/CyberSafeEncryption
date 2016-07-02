@@ -14,9 +14,4 @@
         android:listSelector="#7cfa7f"
         android:layout_height="match_parent" >
     </ListView>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="dsffdsg"/>
 </LinearLayout>

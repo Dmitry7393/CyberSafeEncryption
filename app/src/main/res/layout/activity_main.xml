@@ -2,26 +2,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@drawable/main_activity_gradient"
     tools:context="encryption.com.cybersafeencryption.MainActivity"
     android:weightSum="1">
 
     <Button
+        android:id="@+id/btn_open_encrypt_text_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:text="Шифрование текста"
-        android:id="@+id/btn_open_encrypt_text_activity"
-        android:layout_marginTop="50dp"/>
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:gravity="center"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5" />
 
     <Button
+        android:id="@+id/btn_open_encrypt_files_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Шифрование файлов"
-        android:id="@+id/btn_open_encrypt_files_activity"
-        android:layout_marginTop="60dp"/>
+        android:layout_marginTop="40dp"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:gravity="center"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5" />
 </LinearLayout>
