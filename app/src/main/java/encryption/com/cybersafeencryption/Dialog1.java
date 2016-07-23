@@ -20,7 +20,7 @@ public class Dialog1 extends DialogFragment implements OnClickListener {
         String  mStrEncryptedText = getArguments().getString("text");
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View inflatedView = inflater.inflate(R.layout.dialog1, null);
+        View inflatedView = inflater.inflate(R.layout.dialog_save_note, null);
 
         titleNote = (EditText) inflatedView.findViewById(R.id.editTitleNote);
         note = (EditText) inflatedView.findViewById(R.id.editNote);

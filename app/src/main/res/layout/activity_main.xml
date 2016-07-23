@@ -18,14 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:text="Шифрование текста"
-        android:textColor="#FFFFFF"
-        android:textSize="30sp"
-        android:gravity="center"
-        android:background="@drawable/buttonshape"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5" />
+        style="@style/ButtonMenu" />
 
     <Button
         android:id="@+id/btn_open_encrypt_files_activity"
@@ -33,12 +26,13 @@
         android:layout_height="wrap_content"
         android:text="Шифрование файлов"
         android:layout_marginTop="40dp"
-        android:textColor="#FFFFFF"
-        android:textSize="30sp"
-        android:gravity="center"
-        android:background="@drawable/buttonshape"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5" />
+        style="@style/ButtonMenu"/>
+
+    <Button
+        android:id="@+id/btn_open_drawing_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Рисование"
+        android:layout_marginTop="40dp"
+        style="@style/ButtonMenu"/>
 </LinearLayout>

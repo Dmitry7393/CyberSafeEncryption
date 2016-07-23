@@ -20,7 +20,8 @@
         </activity>
         <activity android:name=".DirectoryPicker" />
         <activity android:name=".EncryptFilesActivity" />
-        <activity android:name=".EncryptTextActivity"></activity>
+        <activity android:name=".EncryptTextActivity" />
+        <activity android:name=".DrawingActivity"></activity>
     </application>
 
 </manifest>

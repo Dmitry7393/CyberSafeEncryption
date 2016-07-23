@@ -28,11 +28,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button   btnOpenEncryptTextActivity = (Button) findViewById(R.id.btn_open_encrypt_text_activity);
         Button   btnOpenEncryptActivity = (Button) findViewById(R.id.btn_open_encrypt_files_activity);
+        Button   btnOpenDrawingActivity = (Button) findViewById(R.id.btn_open_drawing_activity);
 
-        if(btnOpenEncryptTextActivity != null && btnOpenEncryptActivity != null) {
+        if(btnOpenEncryptTextActivity != null && btnOpenEncryptActivity != null && btnOpenDrawingActivity != null) {
 
             btnOpenEncryptTextActivity.setOnClickListener(this);
             btnOpenEncryptActivity.setOnClickListener(this);
+            btnOpenDrawingActivity.setOnClickListener(this);
         }
 
 
@@ -49,7 +51,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent2 = new Intent(MainActivity.this, EncryptFilesActivity.class);
                 startActivity(intent2);
                 break;
-
+            case R.id.btn_open_drawing_activity:
+                Intent intent3 = new Intent(MainActivity.this, DrawingActivity.class);
+                startActivity(intent3);
+                break;
         }
 
     }
