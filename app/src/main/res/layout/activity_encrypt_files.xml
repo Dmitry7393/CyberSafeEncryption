@@ -52,6 +52,12 @@
             android:layout_toRightOf="@id/button_encrypt"/>
     </RelativeLayout>
 
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:id="@+id/progress_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_marginRight="5dp" />
 
 
 </LinearLayout>

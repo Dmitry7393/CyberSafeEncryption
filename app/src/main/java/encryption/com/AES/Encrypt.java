@@ -105,10 +105,10 @@ public class Encrypt extends AES implements Runnable {
 		byte encryptedBytes[];
 		byte[] currentBytes = new byte[16];
 		while ((value = is.read(currentBytes)) != -1) {
-			showPreviousBytes(currentBytes);
 			block4_4 = getBlock4_4(currentBytes, 16);
 			encryptedBytes = Encrypt_block(block4_4, "file");
 			fos.write(encryptedBytes, 0, encryptedBytes.length);
+			CommonSizeOfFiles += encryptedBytes.length;
 			for(int i = 0; i < currentBytes.length; i++) {
 				currentBytes[i] = 0;
 			}

@@ -132,6 +132,7 @@ public class Decrypt extends AES implements Runnable {
 			tempBytes = getBlock4_4(currentBytes, 16);
 			decryptedBytes = Decrypt_block(tempBytes, "file");
 			fos.write(decryptedBytes, 0, decryptedBytes.length);
+			CommonSizeOfFiles += decryptedBytes.length;
 			for (int i = 0; i < 16; i++) {
 				currentBytes[i] = 0;
 			}
