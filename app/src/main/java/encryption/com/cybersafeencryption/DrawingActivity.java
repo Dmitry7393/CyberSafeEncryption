@@ -15,17 +15,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 
 public class DrawingActivity extends AppCompatActivity {
     RelativeLayout holder;
     CanvasView canvasView;
+    TextView txtViewNumberScreen;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawing);
         canvasView = (CanvasView) findViewById(R.id.signature_canvas);
         holder = (RelativeLayout) findViewById(R.id.layout_canvas);
+        txtViewNumberScreen = (TextView) findViewById(R.id.number_screen);
+        txtViewNumberScreen.setText(Integer.toString(canvasView.numberScreen));
     }
     public void clearCanvas(View v) {
         canvasView.clearCanvas();
@@ -33,7 +37,6 @@ public class DrawingActivity extends AppCompatActivity {
     public void saveImage(View v) {
         String fileName = Environment.getExternalStorageDirectory() + "/myimage.png";
         try {
-
             OutputStream stream = new FileOutputStream(fileName);
             Bitmap myBitmap = loadBitmapFromView(holder);
             myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -46,6 +49,19 @@ public class DrawingActivity extends AppCompatActivity {
         catch(IOException e) {
             Log.d("ERROR2", "TTTT2");
         }
+    }
+    public void moveToPreviousScreen(View v) {
+        Log.d("LEFT", "left");
+        if(canvasView.numberScreen != 0)
+          canvasView.moveToPreviousScreen();
+
+        txtViewNumberScreen.setText(Integer.toString(canvasView.numberScreen));
+    }
+    public void moveToNextScreen(View v) {
+      Log.d("RIGHT", "rightttttttttttt");
+        canvasView.moveToNextScreen();
+
+        txtViewNumberScreen.setText(Integer.toString(canvasView.numberScreen));
     }
     public  Bitmap loadBitmapFromView(View v) {
         DisplayMetrics dm = getResources().getDisplayMetrics();

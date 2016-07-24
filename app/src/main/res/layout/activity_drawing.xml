@@ -32,4 +32,37 @@
         android:layout_gravity="bottom|start"
         android:onClick="clearCanvas"
         android:text="Clear" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:id="@+id/button_save_lines"
+            android:onClick="moveToPreviousScreen"
+            android:src="@drawable/icon_left_arrow"
+            android:background="@drawable/round_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#fff"/>
+
+        <ImageButton
+            android:id="@+id/button_restore_lines"
+            android:onClick="moveToNextScreen"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:gravity="center_vertical|center_horizontal"
+            android:src="@drawable/icon_right_arrow"
+            android:background="@drawable/round_button"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/number_screen"
+            android:text="dsfgdfgdfg"/>
+    </LinearLayout>
+
 </FrameLayout>

@@ -12,6 +12,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CanvasView extends View {
     private Bitmap mBitmap;
     private Canvas mCanvas;
@@ -20,14 +23,14 @@ public class CanvasView extends View {
     private Paint mPaint;
     private float mX, mY;
     private static final float TOLERANCE = 5;
+    private List<Path> listScreens;
 
-    public Bitmap getBitmap() {
-        return mBitmap;
-    }
+    int numberScreen = 0;
     public CanvasView(Context c, AttributeSet attrs) {
         super(c, attrs);
         context = c;
-
+        numberScreen = 0;
+        listScreens = new ArrayList<>();
         // we set a new Path
         mPath = new Path();
 
@@ -44,14 +47,52 @@ public class CanvasView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
         // your Canvas will draw onto the defined Bitmap
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(Color.BLUE);
         Log.d("CreateBITMAP", "RRRRRRRR1");
     }
-
+    public void moveToPreviousScreen() {
+        if(numberScreen == listScreens.size()) {
+            listScreens.add(new Path(mPath));
+            mPath.reset();
+            numberScreen = numberScreen - 1;
+            mPath = new Path(listScreens.get(numberScreen));
+            invalidate();
+        } else {
+            listScreens.set(numberScreen, new Path(mPath));
+            mPath.reset();
+            numberScreen = numberScreen - 1;
+            mPath = new Path(listScreens.get(numberScreen));
+            invalidate();
+        }
+    }
+    public void moveToNextScreen() {
+       numberScreen++;
+        if(numberScreen > listScreens.size()) {
+            //Save previous screen
+            listScreens.add(new Path(mPath));
+            mPath.reset();
+            invalidate();
+            return;
+        }
+        if(numberScreen == listScreens.size()) {
+            int previous_screen = numberScreen - 1;
+            listScreens.set(previous_screen, new Path(mPath));
+            mPath.reset();
+            invalidate();
+            return;
+        }
+        if(numberScreen < listScreens.size())
+        {
+            int previous_screen = numberScreen - 1;
+            listScreens.set(previous_screen, new Path(mPath));
+            mPath.reset();
+            mPath = new Path(listScreens.get(numberScreen));
+            invalidate();
+        }
+    }
     // override onDraw
     @Override
     protected void onDraw(Canvas canvas) {
