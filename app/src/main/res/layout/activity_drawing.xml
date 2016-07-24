@@ -6,11 +6,17 @@
     android:id="@+id/frm_layout"
     android:orientation="vertical" >
 
-    <encryption.com.cybersafeencryption.CanvasView
-        android:id="@+id/signature_canvas"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="#FFFFFF" />
+        android:id="@+id/layout_canvas">
+        <encryption.com.cybersafeencryption.CanvasView
+            android:id="@+id/signature_canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="#FFFFFF" />
+    </RelativeLayout>
+
 
     <Button
         android:id="@+id/button_save_bitmap"
