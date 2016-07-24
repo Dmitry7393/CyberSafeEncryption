@@ -2,6 +2,9 @@ package encryption.com.AES;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Environment;
+import android.util.Log;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,7 +119,48 @@ public class Encrypt extends AES implements Runnable {
 		fos.close();
 		is.close();
 	}
+	public void EncryptBitmap(byte[] bytesBitmap) throws IOException  {
+		FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory() + "/streamEncr1.png");
 
+		int value;
+		InputStream inputStreamImage = context.getResources().openRawResource(
+				context.getResources().getIdentifier("imageencryptedfile",
+						"raw", context.getPackageName()));
+		while ((value = inputStreamImage.read()) != -1) {
+			fos.write((byte) value);
+		}
+		inputStreamImage.close();
+
+		byte block4_4[][];
+		byte encryptedBytes[];
+		int j = 0;
+		int bytesCounter = 0;
+		Log.d("DDDDDDDDD", "DDDDDDDDDDDD");
+		byte[] currentBytes = new byte[16];
+		for(int i = 0; i < bytesBitmap.length; i++) {
+			currentBytes[j] = bytesBitmap[i];
+			j++;
+			if(bytesCounter == 15) {
+				block4_4 = getBlock4_4(currentBytes, 16);
+				encryptedBytes = Encrypt_block(block4_4, "file");
+				fos.write(encryptedBytes, 0, encryptedBytes.length);
+				bytesCounter = 0;
+				j = 0;
+				CommonSizeOfFiles += encryptedBytes.length;
+				for(int k = 0; k < 16; k++) {
+					currentBytes[k] = 0;
+				}
+			} else {
+				bytesCounter++;
+			}
+		}
+		if(bytesCounter != 0) {
+			block4_4 = getBlock4_4(currentBytes, 16);
+			encryptedBytes = Encrypt_block(block4_4, "file");
+			fos.write(encryptedBytes, 0, encryptedBytes.length);
+		}
+		fos.close();
+	}
 	public Encrypt(Context current, String key) {
 		this.context = current;
 		if (key.length() <= 16) {

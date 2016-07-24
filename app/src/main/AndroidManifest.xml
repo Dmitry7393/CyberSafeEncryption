@@ -21,7 +21,9 @@
         <activity android:name=".DirectoryPicker" />
         <activity android:name=".EncryptFilesActivity" />
         <activity android:name=".EncryptTextActivity" />
-        <activity android:name=".DrawingActivity"></activity>
+        <activity android:name=".DrawingActivity">
+            android:screenOrientation="landscape"
+        </activity>
     </application>
 
 </manifest>

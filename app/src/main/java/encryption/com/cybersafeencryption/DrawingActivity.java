@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,11 +18,15 @@ import java.io.OutputStream;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import encryption.com.AES.Encrypt;
+import encryption.com.dialogs.DialogSaveBitmap;
 
-public class DrawingActivity extends AppCompatActivity {
+
+public class DrawingActivity extends AppCompatActivity implements DialogSaveBitmap.saveBitmapInterface {
     RelativeLayout holder;
     CanvasView canvasView;
     TextView txtViewNumberScreen;
+    DialogSaveBitmap mDialogSaveBitmap;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,39 +34,39 @@ public class DrawingActivity extends AppCompatActivity {
         canvasView = (CanvasView) findViewById(R.id.signature_canvas);
         holder = (RelativeLayout) findViewById(R.id.layout_canvas);
         txtViewNumberScreen = (TextView) findViewById(R.id.number_screen);
-        txtViewNumberScreen.setText(Integer.toString(canvasView.numberScreen));
+        txtViewNumberScreen.setText(String.valueOf(canvasView.numberScreen));
+        mDialogSaveBitmap = new DialogSaveBitmap();
     }
     public void clearCanvas(View v) {
         canvasView.clearCanvas();
     }
     public void saveImage(View v) {
-        String fileName = Environment.getExternalStorageDirectory() + "/myimage.png";
-        try {
-            OutputStream stream = new FileOutputStream(fileName);
-            Bitmap myBitmap = loadBitmapFromView(holder);
-            myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            stream.close();
-            Log.d("SUCCESS123458", "TTTT234uuuu3");
-        }
-        catch(FileNotFoundException e) {
-            Log.d("ERROR1", "TTTT");
-        }
-        catch(IOException e) {
-            Log.d("ERROR2", "TTTT2");
+        mDialogSaveBitmap.show(getFragmentManager(), "dlg1");
+    }
+    public static byte[] convertBitmapToByteArray(Bitmap bitmap) {
+        if (bitmap == null) {
+            return null;
+        } else {
+            byte[] b = null;
+            try {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+                b = byteArrayOutputStream.toByteArray();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return b;
         }
     }
     public void moveToPreviousScreen(View v) {
-        Log.d("LEFT", "left");
         if(canvasView.numberScreen != 0)
           canvasView.moveToPreviousScreen();
 
-        txtViewNumberScreen.setText(Integer.toString(canvasView.numberScreen));
+        txtViewNumberScreen.setText(String.valueOf(canvasView.numberScreen+1));
     }
     public void moveToNextScreen(View v) {
-      Log.d("RIGHT", "rightttttttttttt");
         canvasView.moveToNextScreen();
-
-        txtViewNumberScreen.setText(Integer.toString(canvasView.numberScreen));
+        txtViewNumberScreen.setText(String.valueOf(canvasView.numberScreen+1));
     }
     public  Bitmap loadBitmapFromView(View v) {
         DisplayMetrics dm = getResources().getDisplayMetrics();
@@ -75,5 +80,34 @@ public class DrawingActivity extends AppCompatActivity {
         v.draw(c);
 
         return returnedBitmap;
+    }
+    public void saveWithoutEncryption(String fileName1) {
+        String fileName = Environment.getExternalStorageDirectory() + "/" + fileName1;
+        try {
+            OutputStream stream = new FileOutputStream(fileName);
+            Bitmap myBitmap = loadBitmapFromView(holder);
+            myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            stream.close();
+        }
+        catch(FileNotFoundException e) {
+        }
+        catch(IOException e) {
+        }
+    }
+    public void encryptAndSave(String key, String fileName1) {
+        String fileName = Environment.getExternalStorageDirectory() + "/" + fileName1;
+        try {
+            OutputStream stream = new FileOutputStream(fileName);
+            Bitmap myBitmap = loadBitmapFromView(holder);
+            myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+            Encrypt encrypt = new Encrypt(this, key);
+            encrypt.EncryptBitmap(convertBitmapToByteArray(myBitmap));
+            stream.close();
+        }
+        catch(FileNotFoundException e) {
+        }
+        catch(IOException e) {
+        }
     }
 }
