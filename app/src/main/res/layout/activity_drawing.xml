@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/lnr"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:id="@+id/frm_layout"
+    android:orientation="vertical" >
+
+    <encryption.com.cybersafeencryption.CanvasView
+        android:id="@+id/signature_canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="#FFFFFF" />
+
     <Button
-        android:id="@+id/button_save_image"
+        android:id="@+id/button_save_bitmap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="46dp"
-        android:text="SAVE IMAGE" />
-    <SurfaceView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/surfaceView"/>
-</LinearLayout>
+        android:layout_gravity="bottom|center"
+        android:onClick="saveImage"
+        android:text="Save image" />
+    <Button
+        android:id="@+id/button_clear_canvas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:onClick="clearCanvas"
+        android:text="Clear" />
+</FrameLayout>
