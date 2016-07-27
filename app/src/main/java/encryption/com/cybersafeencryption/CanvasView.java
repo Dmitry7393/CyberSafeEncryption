@@ -25,7 +25,10 @@ public class CanvasView extends View {
     private static final float TOLERANCE = 5;
     private List<Path> listScreens;
 
-    int numberScreen = 0;
+    private int numberScreen = 0;
+    public int getNumberOfScreens() {
+        return numberScreen;
+    }
     public CanvasView(Context c, AttributeSet attrs) {
         super(c, attrs);
         context = c;

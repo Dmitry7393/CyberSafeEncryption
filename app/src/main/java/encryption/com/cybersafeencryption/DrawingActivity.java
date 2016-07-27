@@ -1,5 +1,6 @@
 package encryption.com.cybersafeencryption;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Environment;
@@ -27,6 +28,9 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
     CanvasView canvasView;
     TextView txtViewNumberScreen;
     DialogSaveBitmap mDialogSaveBitmap;
+    String mfileName;
+    String mKey;
+    int mSaveWithoutEncryotion = 0;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +38,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         canvasView = (CanvasView) findViewById(R.id.signature_canvas);
         holder = (RelativeLayout) findViewById(R.id.layout_canvas);
         txtViewNumberScreen = (TextView) findViewById(R.id.number_screen);
-        txtViewNumberScreen.setText(String.valueOf(canvasView.numberScreen));
+        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
         mDialogSaveBitmap = new DialogSaveBitmap();
     }
     public void clearCanvas(View v) {
@@ -59,14 +63,14 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         }
     }
     public void moveToPreviousScreen(View v) {
-        if(canvasView.numberScreen != 0)
+        if(canvasView.getNumberOfScreens() != 0)
           canvasView.moveToPreviousScreen();
 
-        txtViewNumberScreen.setText(String.valueOf(canvasView.numberScreen+1));
+        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
     }
     public void moveToNextScreen(View v) {
         canvasView.moveToNextScreen();
-        txtViewNumberScreen.setText(String.valueOf(canvasView.numberScreen+1));
+        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
     }
     public  Bitmap loadBitmapFromView(View v) {
         DisplayMetrics dm = getResources().getDisplayMetrics();
@@ -81,33 +85,50 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
 
         return returnedBitmap;
     }
-    public void saveWithoutEncryption(String fileName1) {
-        String fileName = Environment.getExternalStorageDirectory() + "/" + fileName1;
-        try {
-            OutputStream stream = new FileOutputStream(fileName);
-            Bitmap myBitmap = loadBitmapFromView(holder);
-            myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            stream.close();
-        }
-        catch(FileNotFoundException e) {
-        }
-        catch(IOException e) {
+    public void saveWithoutEncryption(String fileName) {
+        mfileName = fileName;
+        mSaveWithoutEncryotion = 1;
+        Intent intent = new Intent(this, DirectoryPicker.class);
+        startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
+
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            String pathDirectory = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
+            if(mSaveWithoutEncryotion == 1) {
+                try {
+                    OutputStream stream = new FileOutputStream(pathDirectory + "/" + mfileName);
+                    Bitmap myBitmap = loadBitmapFromView(holder);
+                    myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    stream.close();
+                }
+                catch(FileNotFoundException e) {
+                }
+                catch(IOException e) {
+                }
+            } else {
+                try {
+                    OutputStream stream = new FileOutputStream(pathDirectory + "/" + mfileName);
+                    Bitmap myBitmap = loadBitmapFromView(holder);
+                    myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+                    Encrypt encrypt = new Encrypt(this, mKey);
+                    encrypt.EncryptBitmap(convertBitmapToByteArray(myBitmap), pathDirectory + "/" + mfileName);
+                    stream.close();
+                }
+                catch(FileNotFoundException e) {
+                }
+                catch(IOException e) {
+                }
+            }
         }
     }
-    public void encryptAndSave(String key, String fileName1) {
-        String fileName = Environment.getExternalStorageDirectory() + "/" + fileName1;
-        try {
-            OutputStream stream = new FileOutputStream(fileName);
-            Bitmap myBitmap = loadBitmapFromView(holder);
-            myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-
-            Encrypt encrypt = new Encrypt(this, key);
-            encrypt.EncryptBitmap(convertBitmapToByteArray(myBitmap));
-            stream.close();
-        }
-        catch(FileNotFoundException e) {
-        }
-        catch(IOException e) {
-        }
+    public void encryptAndSave(String key, String fileName) {
+        mfileName = fileName;
+        mKey = key;
+        mSaveWithoutEncryotion = 0;
+        Intent intent = new Intent(this, DirectoryPicker.class);
+        startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
     }
 }

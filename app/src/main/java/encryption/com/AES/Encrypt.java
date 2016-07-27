@@ -119,9 +119,8 @@ public class Encrypt extends AES implements Runnable {
 		fos.close();
 		is.close();
 	}
-	public void EncryptBitmap(byte[] bytesBitmap) throws IOException  {
-		FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory() + "/streamEncr1.png");
-
+	public void EncryptBitmap(byte[] bytesBitmap, String pathOutput) throws IOException  {
+		FileOutputStream fos = new FileOutputStream(pathOutput);
 		int value;
 		InputStream inputStreamImage = context.getResources().openRawResource(
 				context.getResources().getIdentifier("imageencryptedfile",
@@ -135,7 +134,6 @@ public class Encrypt extends AES implements Runnable {
 		byte encryptedBytes[];
 		int j = 0;
 		int bytesCounter = 0;
-		Log.d("DDDDDDDDD", "DDDDDDDDDDDD");
 		byte[] currentBytes = new byte[16];
 		for(int i = 0; i < bytesBitmap.length; i++) {
 			currentBytes[j] = bytesBitmap[i];

@@ -58,11 +58,11 @@
             android:src="@drawable/icon_right_arrow"
             android:background="@drawable/round_button"
             />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/number_screen"
-            android:text="dsfgdfgdfg"/>
     </LinearLayout>
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/number_screen"
+        android:layout_gravity="top|end"
+        android:textSize="25sp"/>
 </FrameLayout>
