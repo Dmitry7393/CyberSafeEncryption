@@ -58,5 +58,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+    public void tempMethod(View v) {
+        Intent intent = new Intent(MainActivity.this, ColorPickerActivity.class);
+        startActivity(intent);
+    }
 
 }

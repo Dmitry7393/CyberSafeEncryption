@@ -24,6 +24,7 @@
         <activity android:name=".DrawingActivity">
             android:screenOrientation="landscape"
         </activity>
+        <activity android:name=".ColorPickerActivity"></activity>
     </application>
 
 </manifest>

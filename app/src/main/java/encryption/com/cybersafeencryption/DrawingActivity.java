@@ -1,8 +1,10 @@
 package encryption.com.cybersafeencryption;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +25,8 @@ import encryption.com.AES.Encrypt;
 import encryption.com.dialogs.DialogSaveBitmap;
 
 
-public class DrawingActivity extends AppCompatActivity implements DialogSaveBitmap.saveBitmapInterface {
+public class DrawingActivity extends AppCompatActivity implements DialogSaveBitmap.saveBitmapInterface,
+        ColorPicker.OnColorChangedListener  {
     RelativeLayout holder;
     CanvasView canvasView;
     TextView txtViewNumberScreen;
@@ -35,11 +38,13 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawing);
+        this.activity = this;
         canvasView = (CanvasView) findViewById(R.id.signature_canvas);
         holder = (RelativeLayout) findViewById(R.id.layout_canvas);
         txtViewNumberScreen = (TextView) findViewById(R.id.number_screen);
         txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
         mDialogSaveBitmap = new DialogSaveBitmap();
+
     }
     public void clearCanvas(View v) {
         canvasView.clearCanvas();
@@ -63,13 +68,13 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         }
     }
     public void moveToPreviousScreen(View v) {
-        if(canvasView.getNumberOfScreens() != 0)
-          canvasView.moveToPreviousScreen();
+     //   if(canvasView.getNumberOfScreens() != 0)
+        //  canvasView.moveToPreviousScreen();
 
         txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
     }
     public void moveToNextScreen(View v) {
-        canvasView.moveToNextScreen();
+    //    canvasView.moveToNextScreen();
         txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
     }
     public  Bitmap loadBitmapFromView(View v) {
@@ -130,5 +135,13 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         mSaveWithoutEncryotion = 0;
         Intent intent = new Intent(this, DirectoryPicker.class);
         startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
+    }
+    Activity activity;
+    public void getColor(View v) {
+        new ColorPicker(activity, DrawingActivity.this, Color.WHITE)
+                .show();
+    }
+    public void colorChanged(int color) {
+        canvasView.changeColor(color);
     }
 }
