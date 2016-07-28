@@ -27,10 +27,12 @@ import encryption.com.Database.DBHelper;
 import encryption.com.Database.DatabaseHelper;
 import encryption.com.adapters.DividerItemDecoration;
 import encryption.com.adapters.MyRecyclerViewAdapter;
+import encryption.com.adapters.RecyclerItemClickListener;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     DatabaseHelper dbHelper;
-
+    private ImageView mImageView;
+    private  ArrayList<Bitmap> mListBitmaps;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnOpenEncryptTextActivity = (Button) findViewById(R.id.btn_open_encrypt_text_activity);
         Button btnOpenEncryptActivity = (Button) findViewById(R.id.btn_open_encrypt_files_activity);
         Button btnOpenDrawingActivity = (Button) findViewById(R.id.btn_open_drawing_activity);
+        mImageView = (ImageView) findViewById(R.id.image_bitmap);
+        mImageView.setEnabled(false);
 
         if (btnOpenEncryptTextActivity != null && btnOpenEncryptActivity != null && btnOpenDrawingActivity != null) {
 
@@ -86,26 +90,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             RecyclerView.ItemDecoration itemDecoration =
                     new DividerItemDecoration(15);
             mRecyclerView.addItemDecoration(itemDecoration);
+
+            mRecyclerView.addOnItemTouchListener(
+                    new RecyclerItemClickListener(this, mRecyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                        @Override public void onItemClick(View view, int position) {
+                            Log.d("onItemClick1122251", Integer.toString(position));
+                            showFullScreenBitmap(position);
+                        }
+
+                        @Override public void onLongItemClick(View view, int position) {
+                            Log.d("onLongItemClick", Integer.toString(position));
+                        }
+                    })
+            );
         }
     }
 
     private ArrayList<Bitmap> getBitmapsFromDatabase() {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        ArrayList<Bitmap> listBitmaps = new ArrayList<>();
+        mListBitmaps = new ArrayList<>();
         byte[] image;
         if (cursor.moveToFirst()) {
             do {
                 image = cursor.getBlob(cursor.getColumnIndex("image_data"));
-                listBitmaps.add(convertBytesToBitmap(image));
+                mListBitmaps.add(convertBytesToBitmap(image));
             } while (cursor.moveToNext());
         }
-        return listBitmaps;
+        return mListBitmaps;
     }
 
     // convert from byte array to bitmap
     public static Bitmap convertBytesToBitmap(byte[] image) {
         return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
-
+    private void showFullScreenBitmap(int position) {
+        mImageView.setEnabled(true);
+        mImageView.setImageBitmap(mListBitmaps.get(position));
+    }
 }

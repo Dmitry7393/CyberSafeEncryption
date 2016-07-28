@@ -68,13 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="saveBitmapToDatabase"
-            android:text="Save bitmap to SQLite"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="getImageFromDatabase"
-            android:text="Get From SQLite"/>
-
+            android:text="Save in databasee"/>
     </LinearLayout>
     <ImageButton
         android:id="@+id/button_pick_color"

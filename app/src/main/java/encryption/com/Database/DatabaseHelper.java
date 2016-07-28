@@ -20,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Table create statement
     private static final String CREATE_TABLE_IMAGE = "CREATE TABLE " + DB_TABLE + "("+
-            KEY_NAME + " TEXT," +
+             "id integer primary key autoincrement," +
             KEY_IMAGE + " BLOB);";
 
     public DatabaseHelper(Context context) {

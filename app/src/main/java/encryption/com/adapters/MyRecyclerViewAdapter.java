@@ -4,7 +4,9 @@ package encryption.com.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,12 +15,12 @@ import java.util.ArrayList;
 
 import encryption.com.cybersafeencryption.R;
 
-public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MyViewHolder> {
+public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MyViewHolder>  {
     private ArrayList<Bitmap> mListImages;
     private Context mContext;
 
     public MyRecyclerViewAdapter(ArrayList<Bitmap> mListImages, Context mContext) {
-        this.mContext = mContext; //[Comment] Unnecessary "this"
+        this.mContext = mContext;
         this.mListImages = mListImages;
     }
 

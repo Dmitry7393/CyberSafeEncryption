@@ -10,12 +10,13 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
 import java.util.ArrayList;
 
 public class CanvasView extends View {
     private Bitmap mBitmap;
     private Canvas mCanvas;
-    Stroke  mStroke;
+    Stroke mStroke;
     Context context;
     private final int DEFAULT_COLOR = Color.BLUE;
     private Paint mPaint;
@@ -26,9 +27,11 @@ public class CanvasView extends View {
     private ArrayList<Screen> listScreens;
 
     private int numberScreen = 0;
+
     public int getNumberOfScreens() {
         return numberScreen;
     }
+
     public CanvasView(Context c, AttributeSet attrs) {
         super(c, attrs);
         context = c;
@@ -41,19 +44,21 @@ public class CanvasView extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeWidth(4f);
     }
+
     public void changeBackgroundColor(int color) {
-        if(numberScreen < listScreens.size() && listScreens.size() != 0) {
+        if (numberScreen < listScreens.size() && listScreens.size() != 0) {
             Screen s = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), color);
             listScreens.set(numberScreen, s);
-        }
-        else
+        } else
             mCurrentBackgroundColor = color;
 
         invalidate();
     }
+
     public void changeColor(int color) {
         mPaint.setColor(color);
     }
+
     // override onSizeChanged
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -64,8 +69,9 @@ public class CanvasView extends View {
         mCanvas.drawColor(Color.BLUE);
         Log.d("CreateBITMAP", "RRRRRRRR1");
     }
+
     public void moveToPreviousScreen() {
-        if(numberScreen == listScreens.size()) {
+        if (numberScreen == listScreens.size()) {
             Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
             listScreens.add(screen);
             mStrokesOnCurrentScreen.clear();
@@ -80,9 +86,10 @@ public class CanvasView extends View {
             invalidate();
         }
     }
+
     public void moveToNextScreen() {
-       numberScreen++;
-        if(numberScreen > listScreens.size()) {
+        numberScreen++;
+        if (numberScreen > listScreens.size()) {
             //Save previous screen
             Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
             listScreens.add(screen);
@@ -91,7 +98,7 @@ public class CanvasView extends View {
             invalidate();
             return;
         }
-        if(numberScreen == listScreens.size()) {
+        if (numberScreen == listScreens.size()) {
             int previous_screen = numberScreen - 1;
             Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
             listScreens.set(previous_screen, screen);
@@ -99,8 +106,7 @@ public class CanvasView extends View {
             invalidate();
             return;
         }
-        if(numberScreen < listScreens.size())
-        {
+        if (numberScreen < listScreens.size()) {
             int previous_screen = numberScreen - 1;
             Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
             listScreens.set(previous_screen, screen);
@@ -109,6 +115,7 @@ public class CanvasView extends View {
             invalidate();
         }
     }
+
     // override onDraw
     @Override
     protected void onDraw(Canvas canvas) {
@@ -116,12 +123,10 @@ public class CanvasView extends View {
         // draw the mPath with the mPaint on the canvas when onDraw
         Log.d("RRRRRRRRRRRRR", Integer.toString(numberScreen));
 
-        if(numberScreen < listScreens.size() && listScreens.size() != 0) {
+        if (numberScreen < listScreens.size() && listScreens.size() != 0) {
             canvas.drawColor(listScreens.get(numberScreen).getColor());
             mCurrentBackgroundColor = listScreens.get(numberScreen).getColor();
-        }
-        else
-        {
+        } else {
 
             canvas.drawColor(mCurrentBackgroundColor);
         }

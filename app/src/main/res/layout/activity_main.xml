@@ -11,7 +11,11 @@
     android:background="@drawable/main_activity_gradient"
     tools:context="encryption.com.cybersafeencryption.MainActivity"
     android:weightSum="1">
-
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/image_bitmap"/>
     <Button
         android:id="@+id/btn_open_encrypt_text_activity"
         android:layout_width="wrap_content"
@@ -40,4 +44,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="5dp"/>
+
+
 </LinearLayout>

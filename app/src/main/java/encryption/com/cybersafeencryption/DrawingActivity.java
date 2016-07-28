@@ -4,14 +4,11 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -25,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -43,10 +39,9 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
     String mfileName;
     private DatabaseHelper dbHelper;
     String mKey;
-    int mSaveWithoutEncryotion = 0;
-    private ImageView imageView;
+    int mSaveWithoutEncryption = 0;
     private boolean setBackgroundColor;
-
+    private Activity activity;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +54,6 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens() + 1));
         mDialogSaveBitmap = new DialogSaveBitmap();
         dbHelper = new DatabaseHelper(this);
-        imageView = (ImageView) findViewById(R.id.image_view);
     }
 
     public void clearCanvas(View v) {
@@ -114,7 +108,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
 
     public void saveWithoutEncryption(String fileName) {
         mfileName = fileName;
-        mSaveWithoutEncryotion = 1;
+        mSaveWithoutEncryption = 1;
         Intent intent = new Intent(this, DirectoryPicker.class);
         startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
 
@@ -124,7 +118,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         if (requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             String pathDirectory = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
-            if (mSaveWithoutEncryotion == 1) {
+            if (mSaveWithoutEncryption == 1) {
                 try {
                     OutputStream stream = new FileOutputStream(pathDirectory + "/" + mfileName);
                     Bitmap myBitmap = loadBitmapFromView(holder);
@@ -152,12 +146,10 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
     public void encryptAndSave(String key, String fileName) {
         mfileName = fileName;
         mKey = key;
-        mSaveWithoutEncryotion = 0;
+        mSaveWithoutEncryption = 0;
         Intent intent = new Intent(this, DirectoryPicker.class);
         startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
     }
-
-    Activity activity;
 
     public void getColorStroke(View v) {
         new ColorPicker(activity, DrawingActivity.this, Color.WHITE)
@@ -179,7 +171,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
 
     public void saveBitmapToDatabase(View v) {
         Bitmap myBitmap = loadBitmapFromView(holder);
-        addEntry("myPicture", getBytes(myBitmap));
+        addImageToDatabase("image", getBytes(myBitmap));
     }
 
     // convert from bitmap to byte array
@@ -189,37 +181,10 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         return stream.toByteArray();
     }
 
-    public void addEntry(String name, byte[] image) throws SQLiteException {
+    public void addImageToDatabase(String name, byte[] image) throws SQLiteException {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put("image_name", name);
         cv.put("image_data", image);
         database.insert("table_image", null, cv);
-        Log.d("DATABASE", "Images has been added!");
-    }
-
-    public void getImageFromDatabase(View v) {
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
-        Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        byte[] image = null;
-        if (cursor.moveToFirst()) {
-            image = cursor.getBlob(cursor.getColumnIndex("image_data"));
-        }
-        imageView.setImageBitmap(getImage(image));
-        try {
-            FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory() + "/testtt.png");
-            for (int i = 0; i < image.length; i++) {
-                fos.write(image[i]);
-            }
-        } catch (FileNotFoundException e) {
-            Log.d("EXCEPTION", "File not found");
-        } catch (IOException e) {
-            Log.d("EXCEPTION", "IOException");
-        }
-
-    }
-    // convert from byte array to bitmap
-    public static Bitmap getImage(byte[] image) {
-        return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
 }
