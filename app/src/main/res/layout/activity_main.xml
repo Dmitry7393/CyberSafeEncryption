@@ -35,12 +35,4 @@
         android:text="Рисование"
         android:layout_marginTop="40dp"
         style="@style/ButtonMenu"/>
-    <Button
-        android:id="@+id/button_open_color"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:onClick="tempMethod"
-        android:text="Color" />
 </LinearLayout>

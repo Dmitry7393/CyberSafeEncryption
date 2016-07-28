@@ -17,12 +17,13 @@ public class CanvasView extends View {
     private Canvas mCanvas;
     Stroke  mStroke;
     Context context;
+    private final int DEFAULT_COLOR = Color.BLUE;
     private Paint mPaint;
     private float mX, mY;
     private static final float TOLERANCE = 5;
-    private int mBackgroundColor = Color.BLUE;
+    private int mCurrentBackgroundColor = Color.BLUE;
     private ArrayList<Stroke> mStrokesOnCurrentScreen = new ArrayList<>();
-    private ArrayList<ArrayList<Stroke>> listScreens;
+    private ArrayList<Screen> listScreens;
 
     private int numberScreen = 0;
     public int getNumberOfScreens() {
@@ -41,7 +42,13 @@ public class CanvasView extends View {
         mPaint.setStrokeWidth(4f);
     }
     public void changeBackgroundColor(int color) {
-        mBackgroundColor = color;
+        if(numberScreen < listScreens.size() && listScreens.size() != 0) {
+            Screen s = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), color);
+            listScreens.set(numberScreen, s);
+        }
+        else
+            mCurrentBackgroundColor = color;
+
         invalidate();
     }
     public void changeColor(int color) {
@@ -59,15 +66,17 @@ public class CanvasView extends View {
     }
     public void moveToPreviousScreen() {
         if(numberScreen == listScreens.size()) {
-            listScreens.add(new ArrayList<>(mStrokesOnCurrentScreen));
+            Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
+            listScreens.add(screen);
             mStrokesOnCurrentScreen.clear();
             numberScreen = numberScreen - 1;
-            mStrokesOnCurrentScreen = new ArrayList<>(listScreens.get(numberScreen));
+            mStrokesOnCurrentScreen = new ArrayList<>(listScreens.get(numberScreen).strokes);
             invalidate();
         } else {
-            listScreens.set(numberScreen, new ArrayList<>(mStrokesOnCurrentScreen));
+            Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
+            listScreens.set(numberScreen, screen);
             numberScreen = numberScreen - 1;
-            mStrokesOnCurrentScreen = new ArrayList<>(listScreens.get(numberScreen));
+            mStrokesOnCurrentScreen = new ArrayList<>(listScreens.get(numberScreen).strokes);
             invalidate();
         }
     }
@@ -75,14 +84,17 @@ public class CanvasView extends View {
        numberScreen++;
         if(numberScreen > listScreens.size()) {
             //Save previous screen
-            listScreens.add(new ArrayList<>(mStrokesOnCurrentScreen));
+            Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
+            listScreens.add(screen);
             mStrokesOnCurrentScreen.clear();
+            mCurrentBackgroundColor = DEFAULT_COLOR;
             invalidate();
             return;
         }
         if(numberScreen == listScreens.size()) {
             int previous_screen = numberScreen - 1;
-            listScreens.set(previous_screen, new ArrayList<>(mStrokesOnCurrentScreen));
+            Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
+            listScreens.set(previous_screen, screen);
             mStrokesOnCurrentScreen.clear();
             invalidate();
             return;
@@ -90,9 +102,10 @@ public class CanvasView extends View {
         if(numberScreen < listScreens.size())
         {
             int previous_screen = numberScreen - 1;
-            listScreens.set(previous_screen, new ArrayList<>(mStrokesOnCurrentScreen));
+            Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
+            listScreens.set(previous_screen, screen);
             mStrokesOnCurrentScreen.clear();
-            mStrokesOnCurrentScreen = new ArrayList<>(listScreens.get(numberScreen));
+            mStrokesOnCurrentScreen = new ArrayList<>(listScreens.get(numberScreen).strokes);
             invalidate();
         }
     }
@@ -101,7 +114,19 @@ public class CanvasView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // draw the mPath with the mPaint on the canvas when onDraw
-        canvas.drawColor(mBackgroundColor);
+        Log.d("RRRRRRRRRRRRR", Integer.toString(numberScreen));
+
+        if(numberScreen < listScreens.size() && listScreens.size() != 0) {
+            canvas.drawColor(listScreens.get(numberScreen).getColor());
+            mCurrentBackgroundColor = listScreens.get(numberScreen).getColor();
+        }
+        else
+        {
+
+            canvas.drawColor(mCurrentBackgroundColor);
+        }
+
+
         for (Stroke s : mStrokesOnCurrentScreen) {
             canvas.drawPath(s.getPath(), s.getPaint());
         }
