@@ -16,15 +16,15 @@
         android:id="@+id/btn_open_encrypt_text_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="Шифрование текста"
+        android:layout_marginTop="40dp"
+        android:text="Encrypt text"
         style="@style/ButtonMenu" />
 
     <Button
         android:id="@+id/btn_open_encrypt_files_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Шифрование файлов"
+        android:text="Encrypt files"
         android:layout_marginTop="40dp"
         style="@style/ButtonMenu"/>
 
@@ -32,7 +32,12 @@
         android:id="@+id/btn_open_drawing_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Рисование"
+        android:text="Draw picture"
         android:layout_marginTop="40dp"
         style="@style/ButtonMenu"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"/>
 </LinearLayout>

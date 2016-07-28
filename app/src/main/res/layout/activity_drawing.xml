@@ -64,6 +64,17 @@
             android:src="@drawable/icon_right_arrow"
             android:background="@drawable/round_button"
             />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="saveBitmapToDatabase"
+            android:text="Save bitmap to SQLite"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="getImageFromDatabase"
+            android:text="Get From SQLite"/>
+
     </LinearLayout>
     <ImageButton
         android:id="@+id/button_pick_color"
@@ -75,6 +86,10 @@
         android:scaleType="fitCenter"
         android:src="@drawable/image_pick_color"
         android:background="@drawable/round_button" />
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/image_view"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

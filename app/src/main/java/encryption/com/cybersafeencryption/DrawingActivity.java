@@ -1,9 +1,14 @@
 package encryption.com.cybersafeencryption;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Environment;
@@ -19,23 +24,29 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import encryption.com.AES.Encrypt;
+import encryption.com.Database.DatabaseHelper;
 import encryption.com.dialogs.DialogSaveBitmap;
 
 
 public class DrawingActivity extends AppCompatActivity implements DialogSaveBitmap.saveBitmapInterface,
-        ColorPicker.OnColorChangedListener  {
+        ColorPicker.OnColorChangedListener {
     RelativeLayout holder;
     CanvasView canvasView;
     TextView txtViewNumberScreen;
     DialogSaveBitmap mDialogSaveBitmap;
     String mfileName;
+    private DatabaseHelper dbHelper;
     String mKey;
     int mSaveWithoutEncryotion = 0;
+    private ImageView imageView;
     private boolean setBackgroundColor;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,16 +56,20 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         canvasView = (CanvasView) findViewById(R.id.signature_canvas);
         holder = (RelativeLayout) findViewById(R.id.layout_canvas);
         txtViewNumberScreen = (TextView) findViewById(R.id.number_screen);
-        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
+        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens() + 1));
         mDialogSaveBitmap = new DialogSaveBitmap();
-
+        dbHelper = new DatabaseHelper(this);
+        imageView = (ImageView) findViewById(R.id.image_view);
     }
+
     public void clearCanvas(View v) {
         canvasView.clearCanvas();
     }
+
     public void saveImage(View v) {
         mDialogSaveBitmap.show(getFragmentManager(), "dlg1");
     }
+
     public static byte[] convertBitmapToByteArray(Bitmap bitmap) {
         if (bitmap == null) {
             return null;
@@ -70,16 +85,19 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
             return b;
         }
     }
-    public void moveToPreviousScreen(View v) {
-        if(canvasView.getNumberOfScreens() != 0)
-          canvasView.moveToPreviousScreen();
 
-        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
+    public void moveToPreviousScreen(View v) {
+        if (canvasView.getNumberOfScreens() != 0)
+            canvasView.moveToPreviousScreen();
+
+        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens() + 1));
     }
+
     public void moveToNextScreen(View v) {
         canvasView.moveToNextScreen();
-        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
+        txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens() + 1));
     }
+
     public Bitmap loadBitmapFromView(View v) {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         v.measure(View.MeasureSpec.makeMeasureSpec(dm.widthPixels, View.MeasureSpec.EXACTLY),
@@ -93,6 +111,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
 
         return returnedBitmap;
     }
+
     public void saveWithoutEncryption(String fileName) {
         mfileName = fileName;
         mSaveWithoutEncryotion = 1;
@@ -100,20 +119,19 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
 
     }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode == RESULT_OK) {
+        if (requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             String pathDirectory = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
-            if(mSaveWithoutEncryotion == 1) {
+            if (mSaveWithoutEncryotion == 1) {
                 try {
                     OutputStream stream = new FileOutputStream(pathDirectory + "/" + mfileName);
                     Bitmap myBitmap = loadBitmapFromView(holder);
                     myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     stream.close();
-                }
-                catch(FileNotFoundException e) {
-                }
-                catch(IOException e) {
+                } catch (FileNotFoundException e) {
+                } catch (IOException e) {
                 }
             } else {
                 try {
@@ -124,14 +142,13 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
                     Encrypt encrypt = new Encrypt(this, mKey);
                     encrypt.EncryptBitmap(convertBitmapToByteArray(myBitmap), pathDirectory + "/" + mfileName);
                     stream.close();
-                }
-                catch(FileNotFoundException e) {
-                }
-                catch(IOException e) {
+                } catch (FileNotFoundException e) {
+                } catch (IOException e) {
                 }
             }
         }
     }
+
     public void encryptAndSave(String key, String fileName) {
         mfileName = fileName;
         mKey = key;
@@ -139,20 +156,70 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         Intent intent = new Intent(this, DirectoryPicker.class);
         startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
     }
+
     Activity activity;
+
     public void getColorStroke(View v) {
         new ColorPicker(activity, DrawingActivity.this, Color.WHITE)
                 .show();
         setBackgroundColor = false;
     }
+
     public void colorChanged(int color) {
-        if(setBackgroundColor)
-        canvasView.changeBackgroundColor(color);
-        else  canvasView.changeColor(color);
+        if (setBackgroundColor)
+            canvasView.changeBackgroundColor(color);
+        else canvasView.changeColor(color);
     }
+
     public void changeBackgroundColor(View v) {
         new ColorPicker(activity, DrawingActivity.this, Color.WHITE)
                 .show();
         setBackgroundColor = true;
+    }
+
+    public void saveBitmapToDatabase(View v) {
+        Bitmap myBitmap = loadBitmapFromView(holder);
+        addEntry("myPicture", getBytes(myBitmap));
+    }
+
+    // convert from bitmap to byte array
+    public static byte[] getBytes(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        return stream.toByteArray();
+    }
+
+    public void addEntry(String name, byte[] image) throws SQLiteException {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("image_name", name);
+        cv.put("image_data", image);
+        database.insert("table_image", null, cv);
+        Log.d("DATABASE", "Images has been added!");
+    }
+
+    public void getImageFromDatabase(View v) {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.query("table_image", null, null, null, null, null, null);
+        byte[] image = null;
+        if (cursor.moveToFirst()) {
+            image = cursor.getBlob(cursor.getColumnIndex("image_data"));
+        }
+        imageView.setImageBitmap(getImage(image));
+        try {
+            FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory() + "/testtt.png");
+            for (int i = 0; i < image.length; i++) {
+                fos.write(image[i]);
+            }
+        } catch (FileNotFoundException e) {
+            Log.d("EXCEPTION", "File not found");
+        } catch (IOException e) {
+            Log.d("EXCEPTION", "IOException");
+        }
+
+    }
+    // convert from byte array to bitmap
+    public static Bitmap getImage(byte[] image) {
+        return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
 }
