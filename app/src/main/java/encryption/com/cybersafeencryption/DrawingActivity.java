@@ -34,6 +34,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
     String mfileName;
     String mKey;
     int mSaveWithoutEncryotion = 0;
+    private boolean setBackgroundColor;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,16 +69,16 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         }
     }
     public void moveToPreviousScreen(View v) {
-     //   if(canvasView.getNumberOfScreens() != 0)
-        //  canvasView.moveToPreviousScreen();
+        if(canvasView.getNumberOfScreens() != 0)
+          canvasView.moveToPreviousScreen();
 
         txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
     }
     public void moveToNextScreen(View v) {
-    //    canvasView.moveToNextScreen();
+        canvasView.moveToNextScreen();
         txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens()+1));
     }
-    public  Bitmap loadBitmapFromView(View v) {
+    public Bitmap loadBitmapFromView(View v) {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         v.measure(View.MeasureSpec.makeMeasureSpec(dm.widthPixels, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(dm.heightPixels, View.MeasureSpec.EXACTLY));
@@ -137,11 +138,19 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
     }
     Activity activity;
-    public void getColor(View v) {
+    public void getColorStroke(View v) {
         new ColorPicker(activity, DrawingActivity.this, Color.WHITE)
                 .show();
+        setBackgroundColor = false;
     }
     public void colorChanged(int color) {
-        canvasView.changeColor(color);
+        if(setBackgroundColor)
+        canvasView.changeBackgroundColor(color);
+        else  canvasView.changeColor(color);
+    }
+    public void changeBackgroundColor(View v) {
+        new ColorPicker(activity, DrawingActivity.this, Color.WHITE)
+                .show();
+        setBackgroundColor = true;
     }
 }
