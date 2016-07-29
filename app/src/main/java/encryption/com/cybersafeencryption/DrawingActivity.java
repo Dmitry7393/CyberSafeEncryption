@@ -111,7 +111,6 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         mSaveWithoutEncryption = 1;
         Intent intent = new Intent(this, DirectoryPicker.class);
         startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
-
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -171,7 +170,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
 
     public void saveBitmapToDatabase(View v) {
         Bitmap myBitmap = loadBitmapFromView(holder);
-        addImageToDatabase("image", getBytes(myBitmap));
+        addImageToDatabase(getBytes(myBitmap));
     }
 
     // convert from bitmap to byte array
@@ -181,10 +180,38 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         return stream.toByteArray();
     }
 
-    public void addImageToDatabase(String name, byte[] image) throws SQLiteException {
+    public void addImageToDatabase(byte[] image) throws SQLiteException {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("image_data", image);
         database.insert("table_image", null, cv);
+    }
+    final String TAG = "States";
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "DrawingActivity: onStart()");
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "DrawingActivity: onPause()");
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d("Saving bitma", "onStop()");
+        if(canvasView.isImageExist()) {
+            Bitmap myBitmap = loadBitmapFromView(holder);
+            addImageToDatabase(getBytes(myBitmap));
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "DrawingActivity: onDestroy()");
     }
 }

@@ -1,6 +1,5 @@
 package encryption.com.cybersafeencryption;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,26 +12,17 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
-import android.app.DialogFragment;
-import android.widget.ImageView;
-
-import encryption.com.Database.DBHelper;
 import encryption.com.Database.DatabaseHelper;
 import encryption.com.adapters.DividerItemDecoration;
 import encryption.com.adapters.MyRecyclerViewAdapter;
 import encryption.com.adapters.RecyclerItemClickListener;
+import encryption.com.dialogs.DialogShowImage;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     DatabaseHelper dbHelper;
-    private ImageView mImageView;
     private  ArrayList<Bitmap> mListBitmaps;
+    private DialogShowImage mDialogFragmentShowImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +31,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnOpenEncryptTextActivity = (Button) findViewById(R.id.btn_open_encrypt_text_activity);
         Button btnOpenEncryptActivity = (Button) findViewById(R.id.btn_open_encrypt_files_activity);
         Button btnOpenDrawingActivity = (Button) findViewById(R.id.btn_open_drawing_activity);
-        mImageView = (ImageView) findViewById(R.id.image_bitmap);
-        mImageView.setEnabled(false);
 
         if (btnOpenEncryptTextActivity != null && btnOpenEncryptActivity != null && btnOpenDrawingActivity != null) {
 
@@ -51,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             btnOpenDrawingActivity.setOnClickListener(this);
         }
         dbHelper = new DatabaseHelper(this);
+        mDialogFragmentShowImage = new DialogShowImage();
         initRecyclerView(getBitmapsFromDatabase());
-
     }
 
     @Override
@@ -94,12 +82,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mRecyclerView.addOnItemTouchListener(
                     new RecyclerItemClickListener(this, mRecyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                         @Override public void onItemClick(View view, int position) {
-                            Log.d("onItemClick1122251", Integer.toString(position));
-                            showFullScreenBitmap(position);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("nImage", position);
+                            mDialogFragmentShowImage.setArguments(bundle);
+                            mDialogFragmentShowImage.show(getFragmentManager(), "dlg1");
                         }
 
                         @Override public void onLongItemClick(View view, int position) {
-                            Log.d("onLongItemClick", Integer.toString(position));
+                            Log.d("onLongItemClick3", Integer.toString(position));
                         }
                     })
             );
@@ -123,9 +113,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // convert from byte array to bitmap
     public static Bitmap convertBytesToBitmap(byte[] image) {
         return BitmapFactory.decodeByteArray(image, 0, image.length);
-    }
-    private void showFullScreenBitmap(int position) {
-        mImageView.setEnabled(true);
-        mImageView.setImageBitmap(mListBitmaps.get(position));
     }
 }

@@ -44,7 +44,11 @@ public class CanvasView extends View {
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeWidth(4f);
     }
-
+    public boolean isImageExist() {
+        if(mStrokesOnCurrentScreen.size() != 0) {
+            return true;
+        } else return false;
+    }
     public void changeBackgroundColor(int color) {
         if (numberScreen < listScreens.size() && listScreens.size() != 0) {
             Screen s = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), color);
@@ -86,7 +90,6 @@ public class CanvasView extends View {
             invalidate();
         }
     }
-
     public void moveToNextScreen() {
         numberScreen++;
         if (numberScreen > listScreens.size()) {
@@ -120,8 +123,6 @@ public class CanvasView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        // draw the mPath with the mPaint on the canvas when onDraw
-        Log.d("RRRRRRRRRRRRR", Integer.toString(numberScreen));
 
         if (numberScreen < listScreens.size() && listScreens.size() != 0) {
             canvas.drawColor(listScreens.get(numberScreen).getColor());
