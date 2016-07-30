@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 
@@ -27,9 +25,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DatabaseHelper dbHelper;
     private SQLiteDatabase database;
     private DialogShowImage mDialogFragmentShowImage;
-    private ImageView singleImageView;
-    private int numberCurrentImage = -1;
-    private static final int SPACE_BETWEEN_IMAGES = 15;
+    RecyclerView.Adapter mAdapter;
+    private ArrayList<Integer> mListImagesID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnOpenEncryptActivity = (Button) findViewById(R.id.btn_open_encrypt_files_activity);
         Button btnOpenDrawingActivity = (Button) findViewById(R.id.btn_open_drawing_activity);
 
-        singleImageView = (ImageView) findViewById(R.id.single_bitmap);
         if (btnOpenEncryptTextActivity != null && btnOpenEncryptActivity != null && btnOpenDrawingActivity != null) {
 
             btnOpenEncryptTextActivity.setOnClickListener(this);
@@ -51,10 +47,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         database = dbHelper.getWritableDatabase();
 
         mDialogFragmentShowImage = new DialogShowImage();
+        mListImagesID = new ArrayList<>();
+        setImagesIDToArrayList();
+        initRecyclerView();
 
-        initRecyclerView(getBitmapsFromDatabase());
-        openBitmap(this.findViewById(R.id.single_bitmap));
-        Log.d("START", "RRRR");
     }
 
     @Override
@@ -75,7 +71,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void initRecyclerView(ArrayList<Bitmap> mListImages) { //[Comment] What's wrong with formatting??? Ctrl + Shift + L. It's not a C++.
+ /*   private ArrayList<Bitmap> getBitmapsFromDatabase() {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.query("table_image", null, null, null, null, null, null);
+        ArrayList<Bitmap> mListBitmaps = new ArrayList<>();
+        byte[] image;
+        if (cursor.moveToFirst()) {
+            do {
+                image = cursor.getBlob(cursor.getColumnIndex("image_data"));
+                mListBitmaps.add(convertBytesToBitmap(image));
+            } while (cursor.moveToNext());
+        }
+        return mListBitmaps;
+    }
+*/
+    // convert from byte array to bitmap
+    public Bitmap convertBytesToBitmap(byte[] image) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        return BitmapFactory.decodeByteArray(image, 0, image.length, options);
+    }
+    private void initRecyclerView() { //[Comment] What's wrong with formatting??? Ctrl + Shift + L. It's not a C++.
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         if (mRecyclerView != null) {
             mRecyclerView.setHasFixedSize(true);
@@ -83,11 +99,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
             mRecyclerView.setLayoutManager(layoutManager);
 
-            RecyclerView.Adapter mAdapter = new MyRecyclerViewAdapter(mListImages, this);
+             mAdapter = new MyRecyclerViewAdapter(mListImagesID,this);
 
             mRecyclerView.setAdapter(mAdapter);
             RecyclerView.ItemDecoration itemDecoration =
-                    new DividerItemDecoration(SPACE_BETWEEN_IMAGES);
+                    new DividerItemDecoration(15);
             mRecyclerView.addItemDecoration(itemDecoration);
 
             mRecyclerView.addOnItemTouchListener(
@@ -108,47 +124,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             );
         }
     }
-
-    private ArrayList<Bitmap> getBitmapsFromDatabase() {
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+    public void setImagesIDToArrayList() {
         Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        ArrayList<Bitmap> mListBitmaps = new ArrayList<>();
         byte[] image;
+      //  ArrayList<Bitmap> listB = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
-                image = cursor.getBlob(cursor.getColumnIndex("image_data"));
-                mListBitmaps.add(convertBytesToBitmap(image));
-            } while (cursor.moveToNext());
-        }
-        return mListBitmaps;
-    }
-
-    /*  // convert from byte array to bitmap
-      public static Bitmap convertBytesToBitmap(byte[] image) {
-          return BitmapFactory.decodeByteArray(image, 0, image.length);
-      }*/
-    // convert from byte array to bitmap
-    public Bitmap convertBytesToBitmap(byte[] image) {
-        BitmapFactory.Options options = new BitmapFactory.Options();// Create object of bitmapfactory's option method for further option use
-        // options.inJustDecodeBounds = true;
-        // options.inJustDecodeBounds = true;
-        options.inPurgeable = true; // inPurgeable is used to free up memory while required
-        return BitmapFactory.decodeByteArray(image, 0, image.length, options);
-    }
-
-    public void openBitmap(View v) {
-        numberCurrentImage++;
-        Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        byte[] image = null;
-        int i = 0;
-        if (cursor.moveToFirst()) {
-            do {
-                if (i == numberCurrentImage) {
-                    image = cursor.getBlob(cursor.getColumnIndex("image_data"));
-                    singleImageView.setImageBitmap(convertBytesToBitmap(image));
-                    break;
-                }
-                i++;
+                 image = cursor.getBlob(cursor.getColumnIndex("image_data"));
+                 mListImagesID.add(cursor.getInt(0));
             } while (cursor.moveToNext());
         }
     }

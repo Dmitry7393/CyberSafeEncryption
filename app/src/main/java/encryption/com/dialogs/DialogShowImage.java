@@ -25,16 +25,19 @@ import encryption.com.cybersafeencryption.R;
 
 
 public class DialogShowImage extends DialogFragment implements View.OnClickListener {
-    DatabaseHelper dbHelper;
+    private DatabaseHelper dbHelper;
+    private SQLiteDatabase database;
+    private int mIdDatabase;
     private ImageView imageViewBitmap;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         getDialog().setTitle("");
         View v = inflater.inflate(R.layout.dialog_show_image, null);
+        v.findViewById(R.id.btn_delete_bitmap).setOnClickListener(this);
         imageViewBitmap = (ImageView) v.findViewById(R.id.bitmap_view);
         int numberBitmap = getArguments().getInt("nImage");
         dbHelper = new DatabaseHelper(getActivity());
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        database = dbHelper.getWritableDatabase();
         Cursor cursor = database.query("table_image", null, null, null, null, null, null);
         byte[] image = null;
         int i = 0;
@@ -42,6 +45,7 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
             do {
                 if(i == numberBitmap) {
                     image = cursor.getBlob(cursor.getColumnIndex("image_data"));
+                    mIdDatabase = cursor.getInt(0);
                 }
                 i++;
             } while (cursor.moveToNext());
@@ -52,19 +56,18 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
 
     public void onClick(View v) {
         switch(v.getId()) {
-            case R.id.btn_save_without_encryption:
-                Log.d("BUTTON", "Button save without encryption");
+            case R.id.btn_delete_bitmap:
+                  deleteImage();
                 break;
-            case R.id.button_encrypt_save:
-                Log.d("BUTTON", "Button encryptn and save");
-                break;
-            case R.id.button_cancel:
-                Log.d("BUTTON", "CANCEL");
-                break;
+
         }
         dismiss();
     }
-
+    private void deleteImage() {
+        //Delete the row
+        database.delete("table_image", "id" + " = ?", new String[] {Integer.toString(mIdDatabase) });
+        database.close();
+    }
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
     }
