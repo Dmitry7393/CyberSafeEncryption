@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import encryption.com.Database.DatabaseHelper;
 import encryption.com.adapters.DividerItemDecoration;
@@ -21,8 +27,11 @@ import encryption.com.dialogs.DialogShowImage;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     DatabaseHelper dbHelper;
-    private  ArrayList<Bitmap> mListBitmaps;
+    //private  ArrayList<Bitmap> mListBitmaps;
+    private RecyclerView mRecyclerView;
     private DialogShowImage mDialogFragmentShowImage;
+    private RecyclerView.Adapter mAdapter;
+    private ImageView singleImageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnOpenEncryptActivity = (Button) findViewById(R.id.btn_open_encrypt_files_activity);
         Button btnOpenDrawingActivity = (Button) findViewById(R.id.btn_open_drawing_activity);
 
+        singleImageView = (ImageView) findViewById(R.id.single_bitmap);
         if (btnOpenEncryptTextActivity != null && btnOpenEncryptActivity != null && btnOpenDrawingActivity != null) {
 
             btnOpenEncryptTextActivity.setOnClickListener(this);
@@ -40,7 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         dbHelper = new DatabaseHelper(this);
         mDialogFragmentShowImage = new DialogShowImage();
-        initRecyclerView(getBitmapsFromDatabase());
+        Log.d("INITRRRTTTTTTT", "onCreate");
+       // if(mRecyclerView == null)
+          initRecyclerView(getBitmapsFromDatabase());
     }
 
     @Override
@@ -65,14 +77,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Creating RecyclerView
      */
     private void initRecyclerView(ArrayList<Bitmap> mListImages) { //[Comment] What's wrong with formatting??? Ctrl + Shift + L. It's not a C++.
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         if (mRecyclerView != null) {
             mRecyclerView.setHasFixedSize(true);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
             mRecyclerView.setLayoutManager(layoutManager);
 
-            RecyclerView.Adapter mAdapter = new MyRecyclerViewAdapter(mListImages, this);
+             mAdapter = new MyRecyclerViewAdapter(mListImages, this);
 
             mRecyclerView.setAdapter(mAdapter);
             RecyclerView.ItemDecoration itemDecoration =
@@ -99,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Bitmap> getBitmapsFromDatabase() {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        mListBitmaps = new ArrayList<>();
+        ArrayList<Bitmap>  mListBitmaps = new ArrayList<>();
         byte[] image;
         if (cursor.moveToFirst()) {
             do {
@@ -110,8 +122,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return mListBitmaps;
     }
 
-    // convert from byte array to bitmap
+  /*  // convert from byte array to bitmap
     public static Bitmap convertBytesToBitmap(byte[] image) {
         return BitmapFactory.decodeByteArray(image, 0, image.length);
+    }*/
+  // convert from byte array to bitmap
+  public  Bitmap convertBytesToBitmap(byte[] image) {
+      // return BitmapFactory.decodeByteArray(image, 0, image.length);
+      Log.d("MAINACTIVITY_CONVERT", "new solution123");
+      BitmapFactory.Options options=new BitmapFactory.Options();// Create object of bitmapfactory's option method for further option use
+      // options.inJustDecodeBounds = true;
+  //    options.inJustDecodeBounds = true;
+   //   options.inPurgeable = true; // inPurgeable is used to free up memory while required
+      Bitmap songImage1 = BitmapFactory.decodeByteArray(image,0, image.length,options);//Decode image, "thumbnail" is the object of image file
+      // Bitmap songImage = Bitmap.createScaledBitmap(songImage1, 300 , 200 , true);// convert decoded bitmap into well scalled Bitmap format.
+      return songImage1;
+  }
+    public  void updateRecyclerView(View v) {
+        Log.d("SCR", "VVVVVVVVVV");
+   //    ArrayList<Bitmap> ll1 = getBitmapsFromDatabase();
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        Cursor cursor = database.query("table_image", null, null, null, null, null, null);
+        byte[] image = null;
+        if (cursor.moveToFirst()) {
+            do {
+                image = cursor.getBlob(cursor.getColumnIndex("image_data"));
+                break;
+            } while (cursor.moveToNext());
+        }
+        Bitmap singleBitmap = convertBytesToBitmap(image);
+        singleImageView.setImageBitmap(singleBitmap);
     }
 }

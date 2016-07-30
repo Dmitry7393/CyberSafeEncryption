@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
@@ -47,6 +48,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawing);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
         this.activity = this;
         canvasView = (CanvasView) findViewById(R.id.signature_canvas);
         holder = (RelativeLayout) findViewById(R.id.layout_canvas);
@@ -197,21 +199,21 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "DrawingActivity: onPause()");
-    }
-
-    @Override
-    protected void onStop() {
-        Log.d("Saving bitma", "onStop()");
         if(canvasView.isImageExist()) {
             Bitmap myBitmap = loadBitmapFromView(holder);
             addImageToDatabase(getBytes(myBitmap));
         }
+
+    }
+
+    @Override
+    protected void onStop() {
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "DrawingActivity: onDestroy()");
     }
+
 }

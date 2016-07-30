@@ -12,7 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import encryption.com.Database.DatabaseHelper;
@@ -44,7 +49,7 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
               //  mListBitmaps.add(convertBytesToBitmap(image));
             } while (cursor.moveToNext());
         }
-        Bitmap bitmap1 = convertBytesToBitmap(image);
+        Bitmap bitmap1 = ConvertBytes2(image);
         imageViewBitmap.setImageBitmap(bitmap1);
         return v;
     }
@@ -72,8 +77,27 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
         super.onCancel(dialog);
     }
 
+
     // convert from byte array to bitmap
-    public static Bitmap convertBytesToBitmap(byte[] image) {
-        return BitmapFactory.decodeByteArray(image, 0, image.length);
+    public  Bitmap convertBytesToBitmap1(byte[] image) {
+       // return BitmapFactory.decodeByteArray(image, 0, image.length);
+        Log.d("SSSSSSSSS", "new solution");
+        BitmapFactory.Options options=new BitmapFactory.Options();// Create object of bitmapfactory's option method for further option use
+     //   options.inPurgeable = true; // inPurgeable is used to free up memory while required
+        Bitmap songImage1 = BitmapFactory.decodeByteArray(image,0, image.length,options);//Decode image, "thumbnail" is the object of image file
+       // Bitmap songImage = Bitmap.createScaledBitmap(songImage1, 300 , 200 , true);// convert decoded bitmap into well scalled Bitmap format.
+    return songImage1;
+    }
+    public static Bitmap ConvertBytes2(byte[] image) {
+        Bitmap bm;
+        ByteArrayInputStream in = new ByteArrayInputStream(image);
+        try {
+            BufferedInputStream bis = new BufferedInputStream(in);
+            bm = BitmapFactory.decodeStream(bis);
+            bis.close();
+        } catch (IOException e) {
+            return null;
+        }
+        return bm;
     }
 }
