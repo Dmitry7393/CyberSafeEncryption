@@ -10,12 +10,10 @@
     android:orientation="vertical"
     android:background="@drawable/main_activity_gradient"
     tools:context="encryption.com.cybersafeencryption.MainActivity"
-    android:onClick="updateRecyclerView"
     android:weightSum="1">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="updateRecyclerView"
         android:orientation="vertical">
         <Button
             android:id="@+id/btn_open_encrypt_text_activity"
@@ -44,6 +42,7 @@
         <ImageView
             android:layout_width="300dp"
             android:layout_height="200dp"
+            android:onClick="openBitmap"
             android:id="@+id/single_bitmap"/>
 
         <android.support.v7.widget.RecyclerView

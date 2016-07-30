@@ -15,10 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+
 import encryption.com.Database.DatabaseHelper;
 import encryption.com.adapters.DividerItemDecoration;
 import encryption.com.adapters.MyRecyclerViewAdapter;
@@ -26,12 +24,12 @@ import encryption.com.adapters.RecyclerItemClickListener;
 import encryption.com.dialogs.DialogShowImage;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    DatabaseHelper dbHelper;
-    //private  ArrayList<Bitmap> mListBitmaps;
-    private RecyclerView mRecyclerView;
+    private DatabaseHelper dbHelper;
+    private SQLiteDatabase database;
     private DialogShowImage mDialogFragmentShowImage;
-    private RecyclerView.Adapter mAdapter;
     private ImageView singleImageView;
+    private int numberCurrentImage = -1;
+    private static final int SPACE_BETWEEN_IMAGES = 15;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +46,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             btnOpenEncryptActivity.setOnClickListener(this);
             btnOpenDrawingActivity.setOnClickListener(this);
         }
+        //init database
         dbHelper = new DatabaseHelper(this);
+        database = dbHelper.getWritableDatabase();
+
         mDialogFragmentShowImage = new DialogShowImage();
-        Log.d("INITRRRTTTTTTT", "onCreate");
-       // if(mRecyclerView == null)
-          initRecyclerView(getBitmapsFromDatabase());
+
+        initRecyclerView(getBitmapsFromDatabase());
+        openBitmap(this.findViewById(R.id.single_bitmap));
+        Log.d("START", "RRRR");
     }
 
     @Override
@@ -73,34 +75,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /**
-     * Creating RecyclerView
-     */
     private void initRecyclerView(ArrayList<Bitmap> mListImages) { //[Comment] What's wrong with formatting??? Ctrl + Shift + L. It's not a C++.
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         if (mRecyclerView != null) {
             mRecyclerView.setHasFixedSize(true);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
             mRecyclerView.setLayoutManager(layoutManager);
 
-             mAdapter = new MyRecyclerViewAdapter(mListImages, this);
+            RecyclerView.Adapter mAdapter = new MyRecyclerViewAdapter(mListImages, this);
 
             mRecyclerView.setAdapter(mAdapter);
             RecyclerView.ItemDecoration itemDecoration =
-                    new DividerItemDecoration(15);
+                    new DividerItemDecoration(SPACE_BETWEEN_IMAGES);
             mRecyclerView.addItemDecoration(itemDecoration);
 
             mRecyclerView.addOnItemTouchListener(
-                    new RecyclerItemClickListener(this, mRecyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
-                        @Override public void onItemClick(View view, int position) {
+                    new RecyclerItemClickListener(this, mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
                             Bundle bundle = new Bundle();
                             bundle.putInt("nImage", position);
                             mDialogFragmentShowImage.setArguments(bundle);
                             mDialogFragmentShowImage.show(getFragmentManager(), "dlg1");
                         }
 
-                        @Override public void onLongItemClick(View view, int position) {
+                        @Override
+                        public void onLongItemClick(View view, int position) {
                             Log.d("onLongItemClick3", Integer.toString(position));
                         }
                     })
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Bitmap> getBitmapsFromDatabase() {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        ArrayList<Bitmap>  mListBitmaps = new ArrayList<>();
+        ArrayList<Bitmap> mListBitmaps = new ArrayList<>();
         byte[] image;
         if (cursor.moveToFirst()) {
             do {
@@ -122,35 +123,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return mListBitmaps;
     }
 
-  /*  // convert from byte array to bitmap
-    public static Bitmap convertBytesToBitmap(byte[] image) {
-        return BitmapFactory.decodeByteArray(image, 0, image.length);
-    }*/
-  // convert from byte array to bitmap
-  public  Bitmap convertBytesToBitmap(byte[] image) {
-      // return BitmapFactory.decodeByteArray(image, 0, image.length);
-      Log.d("MAINACTIVITY_CONVERT", "new solution123");
-      BitmapFactory.Options options=new BitmapFactory.Options();// Create object of bitmapfactory's option method for further option use
-      // options.inJustDecodeBounds = true;
-  //    options.inJustDecodeBounds = true;
-   //   options.inPurgeable = true; // inPurgeable is used to free up memory while required
-      Bitmap songImage1 = BitmapFactory.decodeByteArray(image,0, image.length,options);//Decode image, "thumbnail" is the object of image file
-      // Bitmap songImage = Bitmap.createScaledBitmap(songImage1, 300 , 200 , true);// convert decoded bitmap into well scalled Bitmap format.
-      return songImage1;
-  }
-    public  void updateRecyclerView(View v) {
-        Log.d("SCR", "VVVVVVVVVV");
-   //    ArrayList<Bitmap> ll1 = getBitmapsFromDatabase();
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+    /*  // convert from byte array to bitmap
+      public static Bitmap convertBytesToBitmap(byte[] image) {
+          return BitmapFactory.decodeByteArray(image, 0, image.length);
+      }*/
+    // convert from byte array to bitmap
+    public Bitmap convertBytesToBitmap(byte[] image) {
+        BitmapFactory.Options options = new BitmapFactory.Options();// Create object of bitmapfactory's option method for further option use
+        // options.inJustDecodeBounds = true;
+        // options.inJustDecodeBounds = true;
+        options.inPurgeable = true; // inPurgeable is used to free up memory while required
+        return BitmapFactory.decodeByteArray(image, 0, image.length, options);
+    }
+
+    public void openBitmap(View v) {
+        numberCurrentImage++;
         Cursor cursor = database.query("table_image", null, null, null, null, null, null);
         byte[] image = null;
+        int i = 0;
         if (cursor.moveToFirst()) {
             do {
-                image = cursor.getBlob(cursor.getColumnIndex("image_data"));
-                break;
+                if (i == numberCurrentImage) {
+                    image = cursor.getBlob(cursor.getColumnIndex("image_data"));
+                    singleImageView.setImageBitmap(convertBytesToBitmap(image));
+                    break;
+                }
+                i++;
             } while (cursor.moveToNext());
         }
-        Bitmap singleBitmap = convertBytesToBitmap(image);
-        singleImageView.setImageBitmap(singleBitmap);
     }
 }

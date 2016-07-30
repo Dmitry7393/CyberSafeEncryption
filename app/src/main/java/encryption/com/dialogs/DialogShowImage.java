@@ -33,11 +33,9 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
         View v = inflater.inflate(R.layout.dialog_show_image, null);
         imageViewBitmap = (ImageView) v.findViewById(R.id.bitmap_view);
         int numberBitmap = getArguments().getInt("nImage");
-        Log.d("Number in database ", Integer.toString(numberBitmap));
         dbHelper = new DatabaseHelper(getActivity());
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-       // mListBitmaps = new ArrayList<>();
         byte[] image = null;
         int i = 0;
         if (cursor.moveToFirst()) {
@@ -46,11 +44,9 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
                     image = cursor.getBlob(cursor.getColumnIndex("image_data"));
                 }
                 i++;
-              //  mListBitmaps.add(convertBytesToBitmap(image));
             } while (cursor.moveToNext());
         }
-        Bitmap bitmap1 = ConvertBytes2(image);
-        imageViewBitmap.setImageBitmap(bitmap1);
+        imageViewBitmap.setImageBitmap(convertBytesToBitmap(image));
         return v;
     }
 
@@ -77,27 +73,12 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
         super.onCancel(dialog);
     }
 
-
     // convert from byte array to bitmap
-    public  Bitmap convertBytesToBitmap1(byte[] image) {
-       // return BitmapFactory.decodeByteArray(image, 0, image.length);
-        Log.d("SSSSSSSSS", "new solution");
+    public  Bitmap convertBytesToBitmap(byte[] image) {
         BitmapFactory.Options options=new BitmapFactory.Options();// Create object of bitmapfactory's option method for further option use
-     //   options.inPurgeable = true; // inPurgeable is used to free up memory while required
+        options.inPurgeable = true; // inPurgeable is used to free up memory while required
         Bitmap songImage1 = BitmapFactory.decodeByteArray(image,0, image.length,options);//Decode image, "thumbnail" is the object of image file
        // Bitmap songImage = Bitmap.createScaledBitmap(songImage1, 300 , 200 , true);// convert decoded bitmap into well scalled Bitmap format.
     return songImage1;
-    }
-    public static Bitmap ConvertBytes2(byte[] image) {
-        Bitmap bm;
-        ByteArrayInputStream in = new ByteArrayInputStream(image);
-        try {
-            BufferedInputStream bis = new BufferedInputStream(in);
-            bm = BitmapFactory.decodeStream(bis);
-            bis.close();
-        } catch (IOException e) {
-            return null;
-        }
-        return bm;
     }
 }
