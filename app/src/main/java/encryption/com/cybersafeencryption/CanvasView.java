@@ -12,19 +12,16 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-public class CanvasView extends View {
-    private Bitmap mBitmap;
-    private Canvas mCanvas;
-    Stroke mStroke;
-    Context context;
-    private final int DEFAULT_COLOR = Color.BLUE;
+public class CanvasView extends View  {
+
+    private Stroke mStroke;
+    private final int DEFAULT_COLOR_BACKGROUND = Color.rgb(132, 112, 255);
     private Paint mPaint;
     private float mX, mY;
     private static final float TOLERANCE = 5;
-    private int mCurrentBackgroundColor = Color.BLUE;
+    private int mCurrentBackgroundColor = DEFAULT_COLOR_BACKGROUND;
     private ArrayList<Stroke> mStrokesOnCurrentScreen = new ArrayList<>();
     private ArrayList<Screen> listScreens;
-
     private int numberScreen = 0;
 
     public int getNumberOfScreens() {
@@ -33,15 +30,15 @@ public class CanvasView extends View {
 
     public CanvasView(Context c, AttributeSet attrs) {
         super(c, attrs);
-        context = c;
+
         numberScreen = 0;
         listScreens = new ArrayList<>();
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setColor(Color.GREEN);
+        mPaint.setColor(Color.DKGRAY);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeWidth(4f);
+        mPaint.setStrokeWidth(10.0f);
     }
     public boolean isImageExist() {
         if(mStrokesOnCurrentScreen.size() != 0) {
@@ -67,8 +64,8 @@ public class CanvasView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         // your Canvas will draw onto the defined Bitmap
-        mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        mCanvas = new Canvas(mBitmap);
+        Bitmap mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(Color.BLUE);
     }
 
@@ -95,7 +92,7 @@ public class CanvasView extends View {
             Screen screen = new Screen(new ArrayList<>(mStrokesOnCurrentScreen), mCurrentBackgroundColor);
             listScreens.add(screen);
             mStrokesOnCurrentScreen.clear();
-            mCurrentBackgroundColor = DEFAULT_COLOR;
+            mCurrentBackgroundColor = DEFAULT_COLOR_BACKGROUND;
             invalidate();
             return;
         }
@@ -188,4 +185,8 @@ public class CanvasView extends View {
         }
         return true;
     }
+    public void setStrokeWidth(int width) {
+        mPaint.setStrokeWidth(width);
+    }
+
 }

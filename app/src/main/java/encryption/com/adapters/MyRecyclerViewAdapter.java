@@ -1,16 +1,12 @@
 package encryption.com.adapters;
 
-
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,15 +16,14 @@ import java.util.ArrayList;
 import encryption.com.Database.DatabaseHelper;
 import encryption.com.cybersafeencryption.R;
 
-public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MyViewHolder>  {
+public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MyViewHolder> {
+
     public ArrayList<Integer> mListID;
-    private Context mContext;
-    private DatabaseHelper dbHelper;
     private SQLiteDatabase database;
-    public MyRecyclerViewAdapter(ArrayList<Integer> mListImages, Context mContext) {
-        this.mContext = mContext;
-        this.mListID = mListImages;
-        dbHelper = new DatabaseHelper(mContext);
+
+    public MyRecyclerViewAdapter(ArrayList<Integer> listID, Context mContext) {
+        this.mListID = listID;
+        DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         database = dbHelper.getWritableDatabase();
     }
 
@@ -39,23 +34,20 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return new MyViewHolder(view);
     }
 
+    private Bitmap getBitmapByID(int id) {
+        Cursor cursor = database.rawQuery("SELECT image_data FROM table_image WHERE id=?", new String[]{id + ""});
+        byte[] image = null;
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            image = cursor.getBlob(cursor.getColumnIndex("image_data"));
+        }
+        cursor.close();
+        return convertBytesToBitmap(image);
+    }
+
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        byte[] image;
-        int i = 0;
-        Bitmap btmp = null;
-        if (cursor.moveToFirst()) {
-            do {
-                if(i == position) {
-                    image = cursor.getBlob(cursor.getColumnIndex("image_data"));
-                    btmp = convertBytesToBitmap(image);
-                    break;
-                }
-                i++;
-            } while (cursor.moveToNext());
-        }
-        holder.imageViewIcon.setImageBitmap(btmp);
+        holder.imageViewIcon.setImageBitmap(getBitmapByID(mListID.get(position)));
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
@@ -71,9 +63,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public int getItemCount() {
         return mListID.size();
     }
+
     public Bitmap convertBytesToBitmap(byte[] image) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-     //   options.inJustDecodeBounds = true;
         return BitmapFactory.decodeByteArray(image, 0, image.length, options);
     }
 }

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
@@ -18,12 +17,12 @@ import android.view.Gravity;
 import android.view.View;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import encryption.com.AES.Encrypt;
@@ -32,23 +31,30 @@ import encryption.com.dialogs.DialogSaveBitmap;
 
 
 public class DrawingActivity extends AppCompatActivity implements DialogSaveBitmap.saveBitmapInterface,
-        ColorPicker.OnColorChangedListener {
+        ColorPicker.OnColorChangedListener, SeekBar.OnSeekBarChangeListener {
     RelativeLayout holder;
     CanvasView canvasView;
     TextView txtViewNumberScreen;
     DialogSaveBitmap mDialogSaveBitmap;
-    String mfileName;
+    String mFileName;
     private DatabaseHelper dbHelper;
     String mKey;
     int mSaveWithoutEncryption = 0;
     private boolean setBackgroundColor;
     private Activity activity;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawing);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
+        SeekBar seekBar = (SeekBar) findViewById(R.id.sb_line_thickness);
+
+        if (seekBar != null) {
+            seekBar.setProgress(10);
+            seekBar.setOnSeekBarChangeListener(this);
+        }
         this.activity = this;
         canvasView = (CanvasView) findViewById(R.id.signature_canvas);
         holder = (RelativeLayout) findViewById(R.id.layout_canvas);
@@ -56,6 +62,12 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens() + 1));
         mDialogSaveBitmap = new DialogSaveBitmap();
         dbHelper = new DatabaseHelper(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveCurrentScreen();
     }
 
     public void clearCanvas(View v) {
@@ -81,8 +93,15 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
             return b;
         }
     }
-
+    public void saveCurrentScreen() {
+        if (canvasView.isImageExist()) {
+            Bitmap myBitmap = loadBitmapFromView(holder);
+            addImageToDatabase(getBytes(myBitmap));
+        }
+    }
     public void moveToPreviousScreen(View v) {
+        saveCurrentScreen();
+
         if (canvasView.getNumberOfScreens() != 0)
             canvasView.moveToPreviousScreen();
 
@@ -90,6 +109,8 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
     }
 
     public void moveToNextScreen(View v) {
+        saveCurrentScreen();
+
         canvasView.moveToNextScreen();
         txtViewNumberScreen.setText(String.valueOf(canvasView.getNumberOfScreens() + 1));
     }
@@ -109,7 +130,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
     }
 
     public void saveWithoutEncryption(String fileName) {
-        mfileName = fileName;
+        mFileName = fileName;
         mSaveWithoutEncryption = 1;
         Intent intent = new Intent(this, DirectoryPicker.class);
         startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
@@ -121,31 +142,31 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
             String pathDirectory = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
             if (mSaveWithoutEncryption == 1) {
                 try {
-                    OutputStream stream = new FileOutputStream(pathDirectory + "/" + mfileName);
+                    OutputStream stream = new FileOutputStream(pathDirectory + "/" + mFileName);
                     Bitmap myBitmap = loadBitmapFromView(holder);
                     myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     stream.close();
-                } catch (FileNotFoundException e) {
                 } catch (IOException e) {
+                    Log.d("SAVING Image", "Not correct path");
                 }
             } else {
                 try {
-                    OutputStream stream = new FileOutputStream(pathDirectory + "/" + mfileName);
+                    OutputStream stream = new FileOutputStream(pathDirectory + "/" + mFileName);
                     Bitmap myBitmap = loadBitmapFromView(holder);
                     myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 
                     Encrypt encrypt = new Encrypt(this, mKey);
-                    encrypt.EncryptBitmap(convertBitmapToByteArray(myBitmap), pathDirectory + "/" + mfileName);
+                    encrypt.EncryptBitmap(convertBitmapToByteArray(myBitmap), pathDirectory + "/" + mFileName);
                     stream.close();
-                } catch (FileNotFoundException e) {
                 } catch (IOException e) {
+                    Log.d("SAVING Image", "Not correct path");
                 }
             }
         }
     }
 
     public void encryptAndSave(String key, String fileName) {
-        mfileName = fileName;
+        mFileName = fileName;
         mKey = key;
         mSaveWithoutEncryption = 0;
         Intent intent = new Intent(this, DirectoryPicker.class);
@@ -170,11 +191,6 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         setBackgroundColor = true;
     }
 
-    public void saveBitmapToDatabase(View v) {
-        Bitmap myBitmap = loadBitmapFromView(holder);
-        addImageToDatabase(getBytes(myBitmap));
-    }
-
     // convert from bitmap to byte array
     public static byte[] getBytes(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -188,32 +204,20 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
         cv.put("image_data", image);
         database.insert("table_image", null, cv);
     }
-    final String TAG = "States";
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "DrawingActivity: onStart()");
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "DrawingActivity: onPause()");
-        if(canvasView.isImageExist()) {
-            Bitmap myBitmap = loadBitmapFromView(holder);
-            addImageToDatabase(getBytes(myBitmap));
-        }
-
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        // TODO Auto-generated method stub
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onStartTrackingTouch(SeekBar seekBar) {
+        // TODO Auto-generated method stub
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onProgressChanged(SeekBar seekBar, int progress,
+                                  boolean fromUser) {
+        canvasView.setStrokeWidth(progress);
     }
-
 }

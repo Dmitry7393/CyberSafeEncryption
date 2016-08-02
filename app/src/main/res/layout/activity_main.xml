@@ -19,7 +19,7 @@
             android:id="@+id/btn_open_encrypt_text_activity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:text="Encrypt text"
             style="@style/ButtonMenu" />
 
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Encrypt files"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             style="@style/ButtonMenu"/>
 
         <Button
@@ -36,39 +36,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Draw picture"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             style="@style/ButtonMenu"/>
-    <!--
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="L"
-                android:onClick="moveLeft"/>
-            <ImageView
-                android:layout_width="150dp"
-                android:layout_height="120dp"
-                android:id="@+id/view_image_db" />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=">"
-                android:onClick="moveRight"/>
-        </LinearLayout>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="GetBitmaps"
-        android:onClick="getAllBitmaps"/>
-         -->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="20dp"/>
     </LinearLayout>
 </ScrollView>

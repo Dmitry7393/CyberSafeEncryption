@@ -3,8 +3,6 @@ package encryption.com.cybersafeencryption;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,11 +20,10 @@ import encryption.com.adapters.RecyclerItemClickListener;
 import encryption.com.dialogs.DialogShowImage;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private DatabaseHelper dbHelper;
     private SQLiteDatabase database;
     private DialogShowImage mDialogFragmentShowImage;
-    RecyclerView.Adapter mAdapter;
     private ArrayList<Integer> mListImagesID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,14 +40,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             btnOpenDrawingActivity.setOnClickListener(this);
         }
         //init database
-        dbHelper = new DatabaseHelper(this);
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
         database = dbHelper.getWritableDatabase();
 
         mDialogFragmentShowImage = new DialogShowImage();
         mListImagesID = new ArrayList<>();
-        setImagesIDToArrayList();
-        initRecyclerView();
-
     }
 
     @Override
@@ -70,28 +64,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+    protected void onStart() {
+        super.onStart();
+        setImagesIDToArrayList();
+        initRecyclerView();
+    }
 
- /*   private ArrayList<Bitmap> getBitmapsFromDatabase() {
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
-        Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        ArrayList<Bitmap> mListBitmaps = new ArrayList<>();
-        byte[] image;
-        if (cursor.moveToFirst()) {
-            do {
-                image = cursor.getBlob(cursor.getColumnIndex("image_data"));
-                mListBitmaps.add(convertBytesToBitmap(image));
-            } while (cursor.moveToNext());
-        }
-        return mListBitmaps;
-    }
-*/
-    // convert from byte array to bitmap
-    public Bitmap convertBytesToBitmap(byte[] image) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        return BitmapFactory.decodeByteArray(image, 0, image.length, options);
-    }
-    private void initRecyclerView() { //[Comment] What's wrong with formatting??? Ctrl + Shift + L. It's not a C++.
+    private void initRecyclerView() {
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         if (mRecyclerView != null) {
             mRecyclerView.setHasFixedSize(true);
@@ -99,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
             mRecyclerView.setLayoutManager(layoutManager);
 
-             mAdapter = new MyRecyclerViewAdapter(mListImagesID,this);
+            RecyclerView.Adapter mAdapter = new MyRecyclerViewAdapter(mListImagesID, this);
 
             mRecyclerView.setAdapter(mAdapter);
             RecyclerView.ItemDecoration itemDecoration =
@@ -124,15 +103,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             );
         }
     }
+
     public void setImagesIDToArrayList() {
         Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        byte[] image;
-      //  ArrayList<Bitmap> listB = new ArrayList<>();
+        mListImagesID.clear();
         if (cursor.moveToFirst()) {
             do {
-                 image = cursor.getBlob(cursor.getColumnIndex("image_data"));
-                 mListImagesID.add(cursor.getInt(0));
+                mListImagesID.add(cursor.getInt(0));
             } while (cursor.moveToNext());
         }
+        cursor.close();
     }
 }

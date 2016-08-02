@@ -62,13 +62,15 @@
             android:scaleType="fitCenter"
             android:gravity="center_vertical|center_horizontal"
             android:src="@drawable/icon_right_arrow"
-            android:background="@drawable/round_button"
-            />
-        <Button
-            android:layout_width="wrap_content"
+            android:background="@drawable/round_button" />
+        <SeekBar
             android:layout_height="wrap_content"
-            android:onClick="saveBitmapToDatabase"
-            android:text="Save in databasee"/>
+            android:layout_width="200dp"
+            android:max="50"
+            android:progress="10"
+            android:layout_marginTop="20dp"
+            android:id="@+id/sb_line_thickness">
+        </SeekBar>
     </LinearLayout>
     <ImageButton
         android:id="@+id/button_pick_color"
