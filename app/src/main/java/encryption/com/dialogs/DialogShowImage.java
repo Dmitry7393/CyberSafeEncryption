@@ -10,27 +10,42 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import encryption.com.Database.DatabaseHelper;
+import encryption.com.cybersafeencryption.MainActivity;
 import encryption.com.cybersafeencryption.R;
 
 
 public class DialogShowImage extends DialogFragment implements View.OnClickListener {
     private SQLiteDatabase database;
     private int mIdDatabase;
-
+    private Bitmap mBitmap;
+    private EditText mEditTextKey;
+    private EditText meEditTextFileName;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getDialog().setTitle("");
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         View v = inflater.inflate(R.layout.dialog_show_image, null);
         v.findViewById(R.id.btn_delete_bitmap).setOnClickListener(this);
+        v.findViewById(R.id.button_save_bitmap).setOnClickListener(this);
+        v.findViewById(R.id.button_encrypt_and_save).setOnClickListener(this);
+        meEditTextFileName = (EditText) v.findViewById(R.id.editTextFileName);
+
+        mEditTextKey = (EditText) v.findViewById(R.id.editTextKey);
         ImageView imageViewBitmap = (ImageView) v.findViewById(R.id.bitmap_view);
         int numberBitmap = getArguments().getInt("nImage");
         DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
         database = dbHelper.getWritableDatabase();
 
-        imageViewBitmap.setImageBitmap(getBitmapByOrderNumber(numberBitmap));
+        mBitmap = getBitmapByOrderNumber(numberBitmap);
+        imageViewBitmap.setImageBitmap(mBitmap);
+
+        String fileName = "image" + String.valueOf(mIdDatabase) + ".png";
+        meEditTextFileName.setText(fileName);
+        mEditTextKey.setText("dmitry.n50");
         return v;
     }
 
@@ -56,7 +71,12 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
             case R.id.btn_delete_bitmap:
                 deleteImage();
                 break;
-
+            case R.id.button_save_bitmap:
+                ((MainActivity) getActivity()).saveImage(mBitmap, false, meEditTextFileName.getText().toString(), mEditTextKey.getText().toString());
+                break;
+            case R.id.button_encrypt_and_save:
+                ((MainActivity) getActivity()).saveImage(mBitmap, true, meEditTextFileName.getText().toString(), mEditTextKey.getText().toString());
+                break;
         }
         dismiss();
     }
@@ -79,4 +99,6 @@ public class DialogShowImage extends DialogFragment implements View.OnClickListe
         BitmapFactory.Options options = new BitmapFactory.Options();
         return BitmapFactory.decodeByteArray(image, 0, image.length, options);
     }
+
+
 }

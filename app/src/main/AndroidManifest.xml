@@ -25,7 +25,12 @@
             android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"
         </activity>
-        <activity android:name=".ColorPickerActivity"></activity>
+        <activity android:name=".ColorPickerActivity" />
+
+        <service
+            android:name="encryption.com.service.EncryptService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

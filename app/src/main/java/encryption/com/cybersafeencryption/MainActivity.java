@@ -3,6 +3,7 @@ package encryption.com.cybersafeencryption;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,7 +11,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import encryption.com.Database.DatabaseHelper;
@@ -18,11 +24,16 @@ import encryption.com.adapters.DividerItemDecoration;
 import encryption.com.adapters.MyRecyclerViewAdapter;
 import encryption.com.adapters.RecyclerItemClickListener;
 import encryption.com.dialogs.DialogShowImage;
+import encryption.com.service.EncryptService;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private SQLiteDatabase database;
     private DialogShowImage mDialogFragmentShowImage;
     private ArrayList<Integer> mListImagesID;
+    private Bitmap mBitmap;
+    private Boolean mSaveWithEncryption;
+    private String mFileName;
+    private String mKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+
     protected void onStart() {
         super.onStart();
         setImagesIDToArrayList();
@@ -113,5 +125,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } while (cursor.moveToNext());
         }
         cursor.close();
+    }
+
+    public void saveImage(Bitmap bitmap, Boolean savingType, String fileName, String key) {
+        mBitmap = bitmap;
+        mSaveWithEncryption = savingType;
+        mFileName = fileName;
+        mKey = key;
+        Intent intent = new Intent(this, DirectoryPicker.class);
+        startActivityForResult(intent, DirectoryPicker.PICK_DIRECTORY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DirectoryPicker.PICK_DIRECTORY) {
+            Bundle extras = data.getExtras();
+            String pathDirectory = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
+
+            Intent intent = new Intent(this, EncryptService.class);
+
+            byte[] byteArray = null;
+            try {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                mBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byteArray = stream.toByteArray();
+                stream.close();
+            } catch (IOException e) {
+            }
+            intent.putExtra("fileName", mFileName);
+            intent.putExtra("image", byteArray);
+            intent.putExtra("pathDirectory", pathDirectory);
+            if(mSaveWithEncryption) {
+                Toast.makeText(MainActivity.this, "Encryption", Toast.LENGTH_LONG).show();
+                intent.putExtra("type_saving", "save_with_encryption");
+                intent.putExtra("key", mKey);
+            } else {
+                Toast.makeText(MainActivity.this, "Saving", Toast.LENGTH_LONG).show();
+                intent.putExtra("type_saving", "save_without_encryption");
+            }
+            startService(intent);
+           /* if (!mSaveWithEncryption) {
+                try {
+                    OutputStream stream = new FileOutputStream(pathDirectory + "/" + mFileName);
+                    mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    stream.close();
+                } catch (IOException e) {
+                    Log.d("SAVING Image", "Not correct path");
+                }
+            } else {
+                try {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    mBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    Toast.makeText(MainActivity.this, "TTT", Toast.LENGTH_LONG).show();
+
+                    Intent intent = new Intent(this, EncryptService.class);
+                    intent.putExtra("image", byteArray);
+                    intent.putExtra("key", mKey);
+                    intent.putExtra("pathDirectory", pathDirectory);
+                    intent.putExtra("fileName", mFileName);
+
+                    startService(intent);
+
+                    stream.close();
+                } catch (IOException e) {
+                    Log.d("SAVING Image", "Not correct path");
+                }
+            }*/
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

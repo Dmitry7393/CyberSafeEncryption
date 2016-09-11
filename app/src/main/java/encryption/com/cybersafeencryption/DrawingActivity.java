@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import encryption.com.AES.Encrypt;
 import encryption.com.Database.DatabaseHelper;
@@ -145,6 +146,7 @@ public class DrawingActivity extends AppCompatActivity implements DialogSaveBitm
                     OutputStream stream = new FileOutputStream(pathDirectory + "/" + mFileName);
                     Bitmap myBitmap = loadBitmapFromView(holder);
                     myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    Toast.makeText(DrawingActivity.this, "Image has been saved2", Toast.LENGTH_LONG).show();
                     stream.close();
                 } catch (IOException e) {
                     Log.d("SAVING Image", "Not correct path");

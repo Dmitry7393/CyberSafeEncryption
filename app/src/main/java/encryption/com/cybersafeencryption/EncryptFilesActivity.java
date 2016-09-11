@@ -14,7 +14,6 @@ import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,66 +28,62 @@ import android.widget.Toast;
 import encryption.com.AES.Decrypt;
 import encryption.com.AES.Encrypt;
 
-public class EncryptFilesActivity extends Activity implements View.OnClickListener{
-    List<ContactInfo> mList;
-    ListViewAdapter customAdapter;
+public class EncryptFilesActivity extends Activity implements View.OnClickListener {
+    private List<ContactInfo> mList;
+    private ListViewAdapter customAdapter;
     private static final int FILE_SELECT_CODE = 0;
-
     private List<Uri> mUriList = new ArrayList<>();
-    List<String> mListOutputPaths = new ArrayList<>();
+    private List<String> mListOutputPaths = new ArrayList<>();
     private Boolean mBooleanEncrypt;
-    EditText editKey;
-    ListView tabListView;
-    Handler mHandler;
-    Button   btnEncrypt;
-    Encrypt mEncrypt;
-    Decrypt mDecrypt;
-    Timer timerEncrypt;
-    private ProgressBar mProgress;
+    private EditText editKey;
+    private ListView tabListView;
+    private Handler mHandler;
+    private Button btnEncrypt;
+    private Encrypt mEncrypt;
+    private Decrypt mDecrypt;
+    private Timer timerEncrypt;
+    private ProgressBar mProgressBar;
     private long mSizeOfSourceFiles = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_encrypt_files);
 
-         tabListView = (ListView) findViewById(R.id.list_view_files);
+        tabListView = (ListView) findViewById(R.id.list_view_files);
 
         mList = new ArrayList<>();
         customAdapter = new ListViewAdapter(this, R.layout.item, mList);
 
         tabListView.setAdapter(customAdapter);
-        Button   btnAdd = (Button) findViewById(R.id.button_select_files);
+        Button btnAdd = (Button) findViewById(R.id.button_select_files);
         btnEncrypt = (Button) findViewById(R.id.button_encrypt);
-        Button   btnDecrypt = (Button) findViewById(R.id.button_decrypt);
+        Button btnDecrypt = (Button) findViewById(R.id.button_decrypt);
 
         editKey = (EditText) findViewById(R.id.edit_key_encrypt_files);
-        mProgress = (ProgressBar) findViewById(R.id.progress_bar);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         btnAdd.setOnClickListener(this);
         btnEncrypt.setOnClickListener(this);
         btnDecrypt.setOnClickListener(this);
         mHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
-                if(msg.what == 1) {
+                if (msg.what == 1) {
                     long valuePercent = (100 * mEncrypt.getCommonSizeOfFiles()) / mSizeOfSourceFiles;
-                    mProgress.setProgress((int) valuePercent);
-                    Log.d("ENCRYPT1234567", "Message");
-                    if(!mEncrypt.threadIsAlive()) {
-                        Log.d("STOP", "THREADISNOTALIVE1");
+                    mProgressBar.setProgress((int) valuePercent);
+                    if (!mEncrypt.threadIsAlive()) {
                         timerEncrypt.cancel();
-                        mProgress.setProgress(0);
+                        mProgressBar.setProgress(0);
                         mSizeOfSourceFiles = 0;
                     }
                 }
-                if(msg.what == 2) {
+                if (msg.what == 2) {
                     long valuePercent = (100 * mDecrypt.getCommonSizeOfFiles()) / mSizeOfSourceFiles;
-                    mProgress.setProgress((int) valuePercent);
-                    Log.d("DECRYPT1234567", "Message");
-                    if(!mDecrypt.threadIsAlive()) {
-                        Log.d("STOP", "THREADISNOTALIVE2");
+                    mProgressBar.setProgress((int) valuePercent);
+                    if (!mDecrypt.threadIsAlive()) {
                         timerEncrypt.cancel();
-                        mProgress.setProgress(0);
+                        mProgressBar.setProgress(0);
                         mSizeOfSourceFiles = 0;
                     }
                 }
@@ -96,8 +91,9 @@ public class EncryptFilesActivity extends Activity implements View.OnClickListen
             }
         };
     }
+
     public void onClick(View v) {
-        switch(v.getId()) {
+        switch (v.getId()) {
             case R.id.button_select_files:
                 selectFiles();
                 break;
@@ -115,6 +111,7 @@ public class EncryptFilesActivity extends Activity implements View.OnClickListen
                 break;
         }
     }
+
     //METHOD WHICH WILL HANDLE DYNAMIC INSERTION
     public void addItems(Uri itemUri) {
         mUriList.add(itemUri);
@@ -124,11 +121,12 @@ public class EncryptFilesActivity extends Activity implements View.OnClickListen
         mList.add(c);
         customAdapter.notifyDataSetChanged();
     }
+
     private void selectFiles() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         }
         try {
@@ -140,6 +138,7 @@ public class EncryptFilesActivity extends Activity implements View.OnClickListen
                     Toast.LENGTH_SHORT).show();
         }
     }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case FILE_SELECT_CODE:
@@ -149,18 +148,17 @@ public class EncryptFilesActivity extends Activity implements View.OnClickListen
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && uri == null) {
                         ClipData clipData = data.getClipData();
                         int count = clipData.getItemCount();
-                        for(int i = 0; i < count; i++) {
+                        for (int i = 0; i < count; i++) {
                             uri = clipData.getItemAt(i).getUri();
                             if (uri != null) {
                                 addItems(uri);
                                 ContentResolver cr = getContentResolver();
                                 try {
                                     InputStream is = cr.openInputStream(uri);
-                                    mSizeOfSourceFiles +=   is.available();
+                                    mSizeOfSourceFiles += is.available();
                                 } catch (FileNotFoundException e) {
 
-                                }
-                                catch (IOException e) {
+                                } catch (IOException e) {
 
                                 }
                                 Log.d("SIZESIZESIZEMultiple", Long.toString(mSizeOfSourceFiles));
@@ -171,11 +169,10 @@ public class EncryptFilesActivity extends Activity implements View.OnClickListen
                         ContentResolver cr = getContentResolver();
                         try {
                             InputStream is = cr.openInputStream(uri);
-                            mSizeOfSourceFiles +=   is.available();
+                            mSizeOfSourceFiles += is.available();
                         } catch (FileNotFoundException e) {
 
-                        }
-                        catch (IOException e) {
+                        } catch (IOException e) {
 
                         }
                         Log.d("SIZESIZESIZESingle", Long.toString(mSizeOfSourceFiles));
@@ -184,31 +181,31 @@ public class EncryptFilesActivity extends Activity implements View.OnClickListen
                 break;
         }
 
-        if(requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode == RESULT_OK) {
+        if (requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             String pathDirectory = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
             View tempView;
             EditText tempEditText;
 
             //Set the output paths
-            for(int i = 0; i < mList.size(); i++) {
+            for (int i = 0; i < mList.size(); i++) {
                 tempView = tabListView.getChildAt(i);
-                tempEditText  = (EditText) tempView.findViewById(R.id.editTextFiles);
+                tempEditText = (EditText) tempView.findViewById(R.id.editTextFiles);
                 mListOutputPaths.add(pathDirectory + "/" + tempEditText.getText().toString());
             }
-            if(mBooleanEncrypt) {
+            if (mBooleanEncrypt) {
                 mEncrypt = new Encrypt(getBaseContext(), editKey.getText().toString());
                 Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         mEncrypt.EncryptGroupsOfFiles(mUriList, mListOutputPaths);
-                         timerEncrypt = new Timer();
+                        timerEncrypt = new Timer();
                         timerEncrypt.schedule(new UpdateTimeTask(1), 0, 1000); //тикаем каждую секунду без задержки
                     }
-                    });
+                });
                 t.start();
             } else {
-                 mDecrypt = new Decrypt(getBaseContext(), editKey.getText().toString());
+                mDecrypt = new Decrypt(getBaseContext(), editKey.getText().toString());
                 Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -222,12 +219,15 @@ public class EncryptFilesActivity extends Activity implements View.OnClickListen
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
     //задача для таймера
     class UpdateTimeTask extends TimerTask {
-        private int type ;
+        private int type;
+
         UpdateTimeTask(int n) {
             type = n;
         }
+
         public void run() {
             mHandler.sendEmptyMessage(type);
         }
