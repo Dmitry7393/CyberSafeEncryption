@@ -4,32 +4,28 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import encryption.com.Database.DatabaseHelper;
-import encryption.com.adapters.DividerItemDecoration;
-import encryption.com.adapters.MyRecyclerViewAdapter;
-import encryption.com.adapters.RecyclerItemClickListener;
-import encryption.com.dialogs.DialogShowImage;
+import encryption.com.adapters.PagerAdapter;
+import encryption.com.fragments.PageMainMenuFragment;
+import encryption.com.fragments.PageViewDrawingsFragment;
 import encryption.com.service.EncryptService;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private SQLiteDatabase database;
-    private DialogShowImage mDialogFragmentShowImage;
-    private ArrayList<Integer> mListImagesID;
+public class MainActivity extends AppCompatActivity  {
     private Bitmap mBitmap;
     private Boolean mSaveWithEncryption;
     private String mFileName;
@@ -40,91 +36,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnOpenEncryptTextActivity = (Button) findViewById(R.id.btn_open_encrypt_text_activity);
-        Button btnOpenEncryptActivity = (Button) findViewById(R.id.btn_open_encrypt_files_activity);
-        Button btnOpenDrawingActivity = (Button) findViewById(R.id.btn_open_drawing_activity);
+        initViewPager();
+    }
+    private void initViewPager()
+    {
+        PageMainMenuFragment tabFragmentMainMenu = new PageMainMenuFragment();
+        PageViewDrawingsFragment tabFragmentViewDrawings = new PageViewDrawingsFragment();
 
-        if (btnOpenEncryptTextActivity != null && btnOpenEncryptActivity != null && btnOpenDrawingActivity != null) {
+        List<Fragment> fragments = new ArrayList<>();
+        fragments.add(tabFragmentMainMenu);
+        fragments.add(tabFragmentViewDrawings);
 
-            btnOpenEncryptTextActivity.setOnClickListener(this);
-            btnOpenEncryptActivity.setOnClickListener(this);
-            btnOpenDrawingActivity.setOnClickListener(this);
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        if (viewPager != null) {
+            viewPager.setAdapter(new PagerAdapter(getSupportFragmentManager(),
+                    fragments));
         }
-        //init database
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        database = dbHelper.getWritableDatabase();
+       /* TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        if (tabLayout != null)
+            tabLayout.setupWithViewPager(viewPager);
 
-        mDialogFragmentShowImage = new DialogShowImage();
-        mListImagesID = new ArrayList<>();
+        if (tabLayout != null && viewPager != null) {
+            tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    viewPager.setCurrentItem(tab.getPosition());
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+        }*/
+
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_open_encrypt_text_activity:
-                Intent intent = new Intent(MainActivity.this, EncryptTextActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.btn_open_encrypt_files_activity:
-                Intent intent2 = new Intent(MainActivity.this, EncryptFilesActivity.class);
-                startActivity(intent2);
-                break;
-            case R.id.btn_open_drawing_activity:
-                Intent intent3 = new Intent(MainActivity.this, DrawingActivity.class);
-                startActivity(intent3);
-                break;
-        }
-    }
+
 
     protected void onStart() {
         super.onStart();
-        setImagesIDToArrayList();
-        initRecyclerView();
-    }
-
-    private void initRecyclerView() {
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        if (mRecyclerView != null) {
-            mRecyclerView.setHasFixedSize(true);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            mRecyclerView.setLayoutManager(layoutManager);
-
-            RecyclerView.Adapter mAdapter = new MyRecyclerViewAdapter(mListImagesID, this);
-
-            mRecyclerView.setAdapter(mAdapter);
-            RecyclerView.ItemDecoration itemDecoration =
-                    new DividerItemDecoration(15);
-            mRecyclerView.addItemDecoration(itemDecoration);
-
-            mRecyclerView.addOnItemTouchListener(
-                    new RecyclerItemClickListener(this, mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View view, int position) {
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("nImage", position);
-                            mDialogFragmentShowImage.setArguments(bundle);
-                            mDialogFragmentShowImage.show(getFragmentManager(), "dlg1");
-                        }
-
-                        @Override
-                        public void onLongItemClick(View view, int position) {
-                            Log.d("onLongItemClick3", Integer.toString(position));
-                        }
-                    })
-            );
-        }
-    }
-
-    public void setImagesIDToArrayList() {
-        Cursor cursor = database.query("table_image", null, null, null, null, null, null);
-        mListImagesID.clear();
-        if (cursor.moveToFirst()) {
-            do {
-                mListImagesID.add(cursor.getInt(0));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
     }
 
     public void saveImage(Bitmap bitmap, Boolean savingType, String fileName, String key) {
@@ -155,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             intent.putExtra("fileName", mFileName);
             intent.putExtra("image", byteArray);
             intent.putExtra("pathDirectory", pathDirectory);
-            if(mSaveWithEncryption) {
+            if (mSaveWithEncryption) {
                 Toast.makeText(MainActivity.this, "Encryption", Toast.LENGTH_LONG).show();
                 intent.putExtra("type_saving", "save_with_encryption");
                 intent.putExtra("key", mKey);
